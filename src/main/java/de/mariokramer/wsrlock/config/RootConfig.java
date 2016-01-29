@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @ComponentScan(basePackages= {"de.mariokramer.wsrlock"},
 				excludeFilters= {@Filter(type=FilterType.ANNOTATION, value=EnableWebMvc.class)})
+
 public class RootConfig {
 
 }
