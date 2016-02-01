@@ -1,8 +1,15 @@
 $(document).ready(function(){
 
 	$('#connect').click(function(){
-		var url = 'http://' + window.location.host + '/wsrlock/marco';
+		var url = 'http://' + window.location.host + '/wsrlock/marcopolo';
 		var sock = new SockJS(url);
+		
+		var stomp = Stomp.over(sock);
+		var payload = JSON.stringify({ 'message': 'Marcoo!'});
+		
+		stomp.connect('guest', 'guest', function(frame){
+			stomp.send("/marco", {}, payload);
+		});
 		
 		sock.onopen = function() {
 			console.log('opening');
