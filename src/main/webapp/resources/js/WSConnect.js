@@ -8,31 +8,26 @@ $(document).ready(function(){
 		var payload = JSON.stringify({ 'message': 'Marcoo!'});
 		
 		stomp.connect('guest', 'guest', function(frame){
-			stomp.send("/marco", {}, payload);
-		});
-		
-		sock.onopen = function() {
-			console.log('opening');
-			sayMarco();
-		};
-	
-		sock.onmessage = function(e) {
-			console.log('Received message: ', e.data);
+			console.log('stomp opening');
+			
 			setTimeout(function(){sayMarco()}, 200);
-		};
-	
-		sock.onclose = function() {
-			console.log('Closing');
-		};
-	
-		function sayMarco() {
-			console.log('Sending Marco');
-			sock.send("Marco");
-		};
-		
-		$('#disconnect').click(function(){
-			sock.close();
+			
+			function sayMarco(){
+				stomp.send("/app/marco", {}, payload);
+			};			
+			
+			var subscription = stomp.subscribe("/topic/shout", handleShout);
+			
+			$('#disconnect').click(function(){
+				stomp.disconnect(function(){
+					console.log('stomp disconnect');
+				});
+			});			
 		});
+		
+		handleShout = function handleShout(incoming){
+			var message = JSON.parse(incoming.body);
+			console.log('Received: ', message);
+		}	
 	})
-
 })
