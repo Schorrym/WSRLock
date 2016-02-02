@@ -8,9 +8,13 @@
     <title>Authenticate me!</title>
 
     <!-- Bootstrap -->
-    <link href="./resources/css/bootstrap.css" rel="stylesheet">
+    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="./resources/css/signin.css" rel="stylesheet">
+    <link href="resources/css/signin.css" rel="stylesheet">
+    <script src="resources/js/sockjs-1.0.3.min.js"></script>
+	<script src="resources/js/jquery-2.1.4.min.js"></script>
+	<script src="resources/js/stomp.min.js"></script>
+	<script src="resources/js/WSConnect.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -23,20 +27,19 @@
   	
    	<div class="container">
 
-      <form class="form-signin">
+      <form class="form-signin" name="f">
         <h2 class="form-signin-heading">Please sign in</h2>
         <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+        <input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="connect">Sign in</button>
+        <input name="_csrf" type="hidden" value="">
       </form>
 
     </div> <!-- /container -->    
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="../js/bootstrap.min.js"></script>
+    <script src="resources/js/bootstrap.min.js"></script>
   </body>
 </html>

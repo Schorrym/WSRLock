@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class WebSocketStompConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	
 //	@Override
 //	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

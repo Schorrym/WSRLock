@@ -116,14 +116,11 @@
 			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Spring Web -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-websocket</artifactId>
-			<version>4.2.4.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-messaging</artifactId>
 			<version>4.2.4.RELEASE</version>
 		</dependency>
 		<dependency>
@@ -137,40 +134,7 @@
 			<version>2.2.2</version>
 		</dependency>
 
-		<!-- Reactor for websocket relay to MQ 
-
-		<dependency>
-			<groupId>io.projectreactor.spring</groupId>
-			<artifactId>reactor-spring-context</artifactId>
-			<version>2.0.5.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectreactor</groupId>
-			<artifactId>reactor-core</artifactId>
-			<version>1.1.6.RELEASE</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.projectreactor</groupId>
-			<artifactId>reactor-net</artifactId>
-			<version>1.1.6.RELEASE</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.projectreactor</groupId>
-			<artifactId>reactor-tcp</artifactId>
-			<version>1.0.1.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-all</artifactId>
-			<version>5.13.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>4.0.31.Final</version>
-		</dependency>-->
+		<!-- Stomp, ActiveMQ Connection -->
 		<dependency>
 			<groupId>io.projectreactor.spring</groupId>
 			<artifactId>reactor-spring-core</artifactId>
@@ -190,6 +154,33 @@
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-net</artifactId>
 			<version>2.0.5.RELEASE</version>
+		</dependency>
+		
+		<!-- Spring Security Package -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-messaging</artifactId>
+			<version>4.0.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>4.0.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>4.0.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>4.0.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>4.2.4.RELEASE</version>
 		</dependency>
 	</dependencies>
 	<build>
