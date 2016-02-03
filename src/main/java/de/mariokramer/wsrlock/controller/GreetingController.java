@@ -19,7 +19,7 @@ public class GreetingController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String wsTest(Map<String, Object> model){
-				
+		
 		return "login";
 	}
 	

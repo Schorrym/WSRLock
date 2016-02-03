@@ -16,18 +16,12 @@
 	<script src="resources/js/stomp.min.js"></script>
 	<script src="resources/js/WSConnect.js"></script>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
   </head>
   <body> 
   	
    	<div class="container">
 
-      <form class="form-signin" name="f">
+      <form class="form-signin" name="f" method="POST">
         <h2 class="form-signin-heading">Please sign in</h2>
         <label for="inputEmail" class="sr-only">Email address</label>
         <input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
