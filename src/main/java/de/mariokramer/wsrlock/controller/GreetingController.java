@@ -17,11 +17,11 @@ public class GreetingController {
 	
 	private static final Logger log = LoggerFactory.getLogger(GreetingController.class);
 	
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String wsTest(Map<String, Object> model){
-		
-		return "login";
-	}
+	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
+	public String redirectLogin(){ return "login"; }
+	
+	@RequestMapping(value = "/start", method = RequestMethod.GET)
+	public String redirectStart(){ return "start"; }
 	
 	@SubscribeMapping("/marco")
 	public Shout handleSubscription(){

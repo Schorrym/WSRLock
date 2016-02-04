@@ -18,13 +18,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.inMemoryAuthentication()
 			.withUser("test").password("test").roles("USER");
 	}
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.formLogin().and().authorizeRequests()
-						.antMatchers("/wsrlock/login").hasRole("USER")
-						.antMatchers(HttpMethod.POST, "/marco").hasRole("USER")
-						.anyRequest().permitAll();
+		http
+			.logout()
+				.logoutUrl("/login?logout")
+				.logoutSuccessUrl("/login?logout")
+				.invalidateHttpSession(true).and()
+				
+			.authorizeRequests()
+				.antMatchers("/resources/**").permitAll()
+				.antMatchers("/**").hasRole("USER")
+				.anyRequest().authenticated().and()
+				.formLogin().loginPage("/login").permitAll()
+							.failureUrl("/login?error")
+							.defaultSuccessUrl("/start")
+							.loginProcessingUrl("/login");
 		
-		http.csrf().disable();
+//		http.authorizeRequests()
+//			.antMatchers("/admin/**").hasRole("USER")
+//			.and()
+//				.formLogin().defaultSuccessUrl("/start")
+//			.and()
+//		    	.formLogin().loginPage("/login").failureUrl("/login?error")
+//		    	.usernameParameter("username").passwordParameter("password")		
+//		    .and()
+//		    	.formLogin().loginProcessingUrl("/j_spring_security_check")
+//		    .and()
+//		    	.logout().logoutSuccessUrl("/login")
+//		    .and()
+//		    	.logout().logoutUrl("/j_spring_security_logout")
+//		    .and()
+//		    	.csrf();
+		
+//		http.formLogin().and().authorizeRequests()
+//						.antMatchers("/wsrlock/login").hasRole("USER")
+//						.antMatchers(HttpMethod.POST, "/marco").hasRole("USER")
+//						.anyRequest().permitAll();
 	}
 }
