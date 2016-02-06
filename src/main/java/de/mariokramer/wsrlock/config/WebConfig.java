@@ -11,13 +11,13 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import de.mariokramer.wsrlock.security.SecurityConfig;
+import de.mariokramer.wsrlock.security.WebSecurityConfig;
 
 
 @Configuration
 @EnableWebMvc
 @ComponentScan("de.mariokramer.wsrlock")
-@Import({SecurityConfig.class})
+@Import({WebSecurityConfig.class})
 public class WebConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean

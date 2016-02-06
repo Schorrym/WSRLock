@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page session="false" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -20,12 +21,16 @@
     <!-- Bootstrap -->
     <link href="resources/css/bootstrap.css" rel="stylesheet">
 	<script src="resources/js/jquery-2.1.4.min.js"></script>
-	
+	<script src="resources/js/sockjs-1.0.3.min.js"></script>
+	<script src="resources/js/jquery-2.1.4.min.js"></script>
+	<script src="resources/js/stomp.min.js"></script>
+	<script src="resources/js/WSConnect.js"></script>
+
   </head>
   <body>
-  	<c:url value="/login?logout" var="logoutUrl" />
+  	<c:url value="/logout" var="logoutUrl" />
   	<form action="${logoutUrl}" method="post" id="logoutForm">
-  		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  		<sec:csrfInput/>
   	</form>
   	
   	<c:if test="${pageContext.request.userPrincipal.name != null}">
@@ -34,7 +39,10 @@
   				<a href="javascript:formSubmit()"> Logout</a>
   		</h3>
   	</c:if>
-  
+  	
+	<sec:csrfMetaTags/>
+	<button id="connect">WebSocket</button>
+  	
     <div class="container">
     <section class="row">
     	<div class="col col-md-1">

@@ -17,11 +17,16 @@ public class GreetingController {
 	
 	private static final Logger log = LoggerFactory.getLogger(GreetingController.class);
 	
+	//HTTP URL Mapping
+	
 	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
 	public String redirectLogin(){ return "login"; }
 	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
 	public String redirectStart(){ return "start"; }
+	
+	
+	//WebSocket URL Mapping
 	
 	@SubscribeMapping("/marco")
 	public Shout handleSubscription(){

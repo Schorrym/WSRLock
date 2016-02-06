@@ -1,16 +1,13 @@
 package de.mariokramer.wsrlock.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-@Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	@Autowired
@@ -23,38 +20,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.logout()
-				.logoutUrl("/login?logout")
-				.logoutSuccessUrl("/login?logout")
+				.logoutUrl("/logout")
+				.logoutSuccessUrl("/login?logout").permitAll()
 				.invalidateHttpSession(true).and()
 				
 			.authorizeRequests()
 				.antMatchers("/resources/**").permitAll()
-				.antMatchers("/**").hasRole("USER")
+				.antMatchers("/admin/**").hasRole("USER")
 				.anyRequest().authenticated().and()
 				.formLogin().loginPage("/login").permitAll()
 							.failureUrl("/login?error")
-							.defaultSuccessUrl("/start")
-							.loginProcessingUrl("/login");
-		
-//		http.authorizeRequests()
-//			.antMatchers("/admin/**").hasRole("USER")
-//			.and()
-//				.formLogin().defaultSuccessUrl("/start")
-//			.and()
-//		    	.formLogin().loginPage("/login").failureUrl("/login?error")
-//		    	.usernameParameter("username").passwordParameter("password")		
-//		    .and()
-//		    	.formLogin().loginProcessingUrl("/j_spring_security_check")
-//		    .and()
-//		    	.logout().logoutSuccessUrl("/login")
-//		    .and()
-//		    	.logout().logoutUrl("/j_spring_security_logout")
-//		    .and()
-//		    	.csrf();
-		
-//		http.formLogin().and().authorizeRequests()
-//						.antMatchers("/wsrlock/login").hasRole("USER")
-//						.antMatchers(HttpMethod.POST, "/marco").hasRole("USER")
-//						.anyRequest().permitAll();
+							.defaultSuccessUrl("/start");
 	}
 }

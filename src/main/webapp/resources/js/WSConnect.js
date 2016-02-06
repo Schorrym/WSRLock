@@ -4,10 +4,19 @@ $(document).ready(function(){
 		var url = 'http://' + window.location.host + '/wsrlock/marcopolo';
 		var sock = new SockJS(url);
 		
+		var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+		var csrfToken = $("meta[name='_csrf']").attr("content");
+		
+		var headers = {
+		      login: 'guest',
+		      passcode: 'guest',
+		};
+		headers[csrfHeader] = csrfToken;
+		
 		var stomp = Stomp.over(sock);
 		var payload = JSON.stringify({ 'message': 'Marcoo!'});
 		
-		stomp.connect('guest', 'guest', function(frame){
+		stomp.connect(headers, function(frame){
 			console.log('stomp opening');
 			
 			setTimeout(function(){sayMarco()}, 200);

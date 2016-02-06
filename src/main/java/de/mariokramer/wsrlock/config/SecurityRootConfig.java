@@ -11,6 +11,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ComponentScan(basePackages= {"de.mariokramer.wsrlock"},
 				excludeFilters= {@Filter(type=FilterType.ANNOTATION, value=EnableWebMvc.class)})
 
-public class RootConfig extends AbstractSecurityWebApplicationInitializer{
+public class SecurityRootConfig extends AbstractSecurityWebApplicationInitializer {
 
 }

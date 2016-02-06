@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -18,7 +19,7 @@
     <script src="resources/js/sockjs-1.0.3.min.js"></script>
 	<script src="resources/js/jquery-2.1.4.min.js"></script>
 	<script src="resources/js/stomp.min.js"></script>
-	<script src="resources/js/WSConnect.js"></script>-->
+	<script src="resources/js/WSConnect.js"></script> -->
 
   </head>
   <body> 
@@ -42,7 +43,7 @@
         <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>
         <label for="password" class="sr-only">Password</label>
         <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
-        <input name="${_csrf.parameterName}" type="hidden" value="${_csrf.token}" />
+        <sec:csrfInput/>
         <button class="btn btn-lg btn-primary btn-block" type="submit" id="connect" name="submit">Sign in</button>
       </form>
 
