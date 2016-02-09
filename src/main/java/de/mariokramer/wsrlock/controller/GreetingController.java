@@ -1,12 +1,9 @@
 package de.mariokramer.wsrlock.controller;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +16,8 @@ public class GreetingController {
 	
 	//HTTP URL Mapping
 	
-	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
-	public String redirectLogin(){ return "login"; }
+//	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
+//	public String redirectLogin(){ return "login"; }
 	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
 	public String redirectStart(){ return "start"; }

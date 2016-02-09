@@ -26,7 +26,6 @@
   	
    	<div class="container">
 
-		<!-- <c:url value="/j_spring_security_check" /> -->
 	  <c:url value="/login" var="loginUrl" />
       <form class="form-signin" name="loginForm" 
       		action="${loginUrl}" method="POST">
