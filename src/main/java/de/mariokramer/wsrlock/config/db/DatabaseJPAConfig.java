@@ -1,10 +1,11 @@
 package de.mariokramer.wsrlock.config.db;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -13,17 +14,18 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 @Configuration
+@EnableJpaRepositories(basePackages= {"de.mariokramer.wsrlock.persistence"})
 public class DatabaseJPAConfig {
 
 	@Bean
-	public DataSource generateDataSource() {
-		DriverManagerDataSource driverManager = new DriverManagerDataSource();
-		driverManager.setDriverClassName("org.postgresql.Driver");
-		driverManager.setUrl("jdbc:postgresql:wsrlock");
-		driverManager.setUsername("wsrlock");
-		driverManager.setPassword("wsrlock");
+	public DataSource dataSource() {
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setUrl("jdbc:postgresql:wsrlock");
+		dataSource.setUsername("wsrlock");
+		dataSource.setPassword("wsrlock");
 		
-		return driverManager;
+		return dataSource;
 	}
 	
 	@Bean
@@ -37,21 +39,18 @@ public class DatabaseJPAConfig {
 	}
 	
 	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {		
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+			DataSource dataSource, JpaVendorAdapter jpaVendorAdapter) {		
 		LocalContainerEntityManagerFactoryBean entityManagerFB = new LocalContainerEntityManagerFactoryBean();
-		entityManagerFB.setJpaVendorAdapter(jpaVendorAdapter());
-		entityManagerFB.setDataSource(generateDataSource());
+		entityManagerFB.setJpaVendorAdapter(jpaVendorAdapter);
+		entityManagerFB.setDataSource(dataSource);
 		entityManagerFB.setPackagesToScan("de.mariokramer.wsrlock.model");
 		
 		return entityManagerFB;		
 	}
 	
 	@Bean
-	@Autowired
-	public JpaTransactionManager transactionManager() {
-		JpaTransactionManager txManager = new JpaTransactionManager();
-		txManager.setEntityManagerFactory(entityManagerFactory().getObject());
-		
-		return txManager;
-	}
+	public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
+		return new JpaTransactionManager(emf);
+	}	
 }

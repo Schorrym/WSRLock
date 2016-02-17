@@ -27,8 +27,7 @@
    	<div class="container">
 
 	  <c:url value="/login" var="loginUrl" />
-      <form class="form-signin" name="loginForm" 
-      		action="${loginUrl}" method="POST">
+      <form class="form-signin" name="loginForm" action="${loginUrl}" method="POST">
       	<h4>
       		<c:if test="${param.error != null}">
 				Invalid username and password.

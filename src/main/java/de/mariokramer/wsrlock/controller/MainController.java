@@ -1,7 +1,10 @@
 package de.mariokramer.wsrlock.controller;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
@@ -9,18 +12,31 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import de.mariokramer.wsrlock.model.Document;
+import de.mariokramer.wsrlock.persistence.DocumentDao;
+
 @Controller
-public class GreetingController {
+public class MainController {
 	
-	private static final Logger log = LoggerFactory.getLogger(GreetingController.class);
+	private static final Logger log = LoggerFactory.getLogger(MainController.class);
+
+	@Autowired
+	private DocumentDao docDao;
 	
 	//HTTP URL Mapping
 	
-//	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
-//	public String redirectLogin(){ return "login"; }
-	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
-	public String redirectStart(){ return "start"; }
+	public String redirectStart(Map<String, Object> model){ 
+		model.put("documents", docDao.findAll());
+		
+		return "start";
+	}
+	
+	@RequestMapping(value = "/readdoc", method = RequestMethod.GET)
+	public String redirectReadDoc() {
+		
+		return "readdoc";
+	}
 	
 	
 	//WebSocket URL Mapping
