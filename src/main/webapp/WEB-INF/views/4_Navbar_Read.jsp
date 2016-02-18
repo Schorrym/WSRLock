@@ -8,7 +8,7 @@
 				<span class="sr-only">Toggle navigation</span> <span
 					class="icon-bar">asdf</span>
 			</button>
-			<a class="navbar-brand" href="#">Platzhalter</a>
+			<p class="navbar-brand" >Platzhalter</p>
 		</div>
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
@@ -20,7 +20,7 @@
 							id="edit">edit</a>
 					</h3></li>
 				<li><h3>
-						<a href="#" type="button" class="btn btn-default" id="overview">leave
+						<a href="<c:url value="/start" var="startUrl" />" type="button" class="btn btn-default" id="overview">leave
 							document</a>
 					</h3></li>
 				<li><h3>
@@ -31,7 +31,8 @@
 					</h3></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li class="logout"><%@include file="6_UserLogout.jsp"%>
+				<li class="logout">
+					<%@include file="6_UserLogout.jsp"%>
 				</li>
 			</ul>
 		</div>

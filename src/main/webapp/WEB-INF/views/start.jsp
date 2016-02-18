@@ -10,10 +10,6 @@ $(document).ready(function(){
 		$(this).closest('tr').remove();
 	});
 	
-	$("#addDoc").click(function(){
-		$("#docTable").find('tbody')
-			.append()
-	});
 })
 </script>
 
