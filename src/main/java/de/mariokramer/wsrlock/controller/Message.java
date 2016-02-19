@@ -1,6 +1,6 @@
 package de.mariokramer.wsrlock.controller;
 
-public class Shout {
+public class Message {
 
 	private String message;
 	

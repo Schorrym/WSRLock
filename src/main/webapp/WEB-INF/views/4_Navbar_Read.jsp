@@ -16,11 +16,12 @@
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li><h3>
-						<a type="button" class="btn btn-default" disabled="disabled"
+						<a onclick="editDoc()" type="button" class="btn btn-default" 
 							id="edit">edit</a>
 					</h3></li>
 				<li><h3>
-						<a href="<c:url value="/start" var="startUrl" />" type="button" class="btn btn-default" id="overview">leave
+						<!-- href="<c:url value="/start" />"  -->
+						<a onclick="leaveDoc()"  type="button" class="btn btn-default" id="overview">leave
 							document</a>
 					</h3></li>
 				<li><h3>

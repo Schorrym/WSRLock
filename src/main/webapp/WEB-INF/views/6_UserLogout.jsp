@@ -6,8 +6,8 @@
 </form>
 <c:if test="${pageContext.request.userPrincipal.name != null}">
 	<h3>
-		Welcome: ${pageContext.request.userPrincipal.name} | <a
-			href="javascript:formSubmit()"> Logout</a>
+		Welcome: ${pageContext.request.userPrincipal.name} | 
+		<a onclick="leaveDoc()" href="javascript:formSubmit()"> Logout</a>
 	</h3>
 </c:if>
 

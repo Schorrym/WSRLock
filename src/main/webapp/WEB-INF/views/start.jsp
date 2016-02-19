@@ -2,53 +2,8 @@
 <html lang="en">
 <head>
 <%@include file="2_Head.jsp"%>
+<script src="resources/js/custom_ajax.js"></script>
 <title>Documents Overview</title>
-
-<script type="text/javascript">
-
-$(document).ready(function(){	
-	//Function to delete a row in table with ID "docTable"
-	$("[id^=delDoc]").click(function(){
-		$(this).closest('tr').remove();
-	});
-})
-//Function to delete a Document in database
-function delDoc(docId){
-	$.ajax({
-		type: "GET",
-		data: {"task": "deleteDocument",
-			   "delDocId": docId},
-		url: "/wsrlock/changeDoc",
-		success: function(){
-			console.log('Deleted document with ID: '+docId+' from database');
-		},
-	   	error: function (data, status, er) {
-            console.log("error: " + JSON.stringify(data) + " \nstatus: " + status + "\ner: " + er);
-        }
-	});
-};
-//Function to add new entry in database and row in table with ID "docTable"
-function addDoc(){	
-	var docName = $("#docName").val();
-	var docValue = $("#docValue").val();
-	
-	$.ajax({
-		type: "GET",		
-		data: {"task": "addDocument",
-			   "addDocName": docName,
-			   "addDocValue": docValue},
-		url: "/wsrlock/changeDoc",
-		success: function() {
-			var newRowId = $('#docTable tr:last').prev().attr('');
-			var html = "<tr><td>"+(newRowId+1)+"</td><td>"+docName+"</td><td>"+docValue+"</td><td>BUTTONS</td></tr>";
-			$(html).insertBefore("#rowadd");
-		},
-	   	error: function (data, status, er) {
-            console.log("error: " + JSON.stringify(data) + " \nstatus: " + status + "\ner: " + er);
-        }
-	});
-};
-</script>
 
 </head>
 
@@ -72,12 +27,12 @@ function addDoc(){
 						<tbody>							
 							<c:forEach var="doc" items="${documents}" varStatus="counter">
 								<tr id="row-${doc.docId}">
-									<td>${counter.count}</td>
+									<td>${doc.docId}</td>
 									<td>${doc.docName}</td>
 									<td>${doc.docValue}</td>
 									<td>
-										<a href="/docEdit?docId=${doc.docId}" type="button" value="Show" class="btn btn-primary" id="showDoc">Show</a> 
-										<button onclick="delDoc(${doc.docId})" type="button" value="x" class="btn btn-danger" id="delDoc${doc.docId}">x</button>
+										<a href="<c:url value="/readDoc?docId=${doc.docId}"/>" type="button" class="btn btn-primary" id="showDoc">Show</a>
+										<a onclick="delDoc(${doc.docId})" type="button" class="btn btn-danger" id="delDocId${doc.docId}">x</a>
 									</td>
 								</tr>
 							</c:forEach>
@@ -94,9 +49,7 @@ function addDoc(){
 									</td>
 								</tr>							
 						</tbody>
-					</table>
-					<sec:csrfInput/>
-					
+					</table>					
 				</div>
 			</div>
 		</section>

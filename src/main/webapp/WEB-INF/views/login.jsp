@@ -5,8 +5,7 @@
     <title>Authenticate me!</title>
     
     <!-- Custom styles for this template -->
-    <link href="resources/css/signin.css" rel="stylesheet">
-    
+    <link href="resources/css/signin.css" rel="stylesheet">    
 
   </head>
   <body> 
