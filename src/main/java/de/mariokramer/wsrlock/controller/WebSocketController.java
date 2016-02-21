@@ -33,13 +33,13 @@ public class WebSocketController {
 	@Autowired
 	private DocumentFeedService docService;
 	
-//	@SubscribeMapping("/marco")
-//	public Message handleSubscriptionWhat(){
-//		
-//		Message outgoing = new Message();
-//		outgoing.setTask("Polo!");
-//		return outgoing;
-//	}
+	@MessageMapping("/editDoc")
+	public void editDoc(Document doc, Principal principal){
+		doc = docDao.findOne(doc.getDocId());
+		synchronized (doc) {
+			
+		}
+	}
 	
 	@MessageMapping("/delDoc")
 	public void deleteDocument(Document doc){
@@ -53,12 +53,9 @@ public class WebSocketController {
 	}
 	
 	@MessageMapping("/addDoc")
-	public void handleSubscription(Document doc,Principal principal) {
+	public void handleSubscription(Document doc) {
 		doc = docDao.save(doc);
 		log.info("New Document added to database through WebSockets");
 		docService.broadcastDocument(doc);
-//		log.info("Received Message: " + doc.getDocName());
-//		log.info("Received Message: " + doc.getDocValue());
-//		log.info("Received Message: " + principal.getName());		
 	}
 }
