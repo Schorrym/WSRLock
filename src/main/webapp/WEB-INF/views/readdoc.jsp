@@ -7,41 +7,13 @@
 		function textAreaAdjust(o) {
 			o.style.height = "1px";
 			o.style.height = (25 + o.scrollHeight) + "px";
-		};
-		function leaveDoc(){
-			conData.docSub.unsubscribe();
-			conData.client.disconnect(function(){
-				console.log('stomp disconnect');
-			});
-		};
-		handleMessages = function (incoming){
-			var message = JSON.parse(incoming.body)
-			console.log('Received: ', message);
-		};
-		
-		var currDocId = '${currentDoc.docId}'
-		conData.docSub = conData.client.subscribe('/topic/doc'+currDocId, handleMessages);
-		
-		var payload = JSON.stringify({'task':'edit',
-									  'docId': '${currentDoc.docId})'
-									  });
-		function editDoc(){
-			conData.client.send("/app/control", {}, payload);
-		}
-		
-// 		var payload = JSON.stringify({ 'message': 'Marcoo!'});
-		
-// 		function sayMarco(){
-// 			stomp.send("/app/marco", {}, payload);
-// 		};			
-					
-// 		setTimeout(function(){sayMarco()}, 200);
+		};		
 	</script>
 
 	<title>Viewing document</title>
   </head>
     
-  <body>  
+  <body onload="initializeConnection('readdoc')">  
   	<%@include file="4_Navbar_Read.jsp" %>
 		<div class="container">	
 	    <section class="row">
@@ -57,5 +29,6 @@
 			</div>
 		</section>
 		</div>
+		<input type="hidden" id="pageName" value="readdoc">
 	</body>
 </html>

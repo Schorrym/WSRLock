@@ -6,9 +6,9 @@
 				data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
 				aria-expanded="false">
 				<span class="sr-only">Toggle navigation</span> <span
-					class="icon-bar">asdf</span>
+					class="icon-bar"></span>
 			</button>
-			<p class="navbar-brand" >Platzhalter</p>
+			<p class="navbar-brand"></p>
 		</div>
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
@@ -21,7 +21,7 @@
 					</h3></li>
 				<li><h3>
 						<!-- href="<c:url value="/start" />"  -->
-						<a onclick="leaveDoc()"  type="button" class="btn btn-default" id="overview">leave
+						<a onclick="leaveDoc()" href="<c:url value="/start" />" type="button" class="btn btn-default" id="overview">leave
 							document</a>
 					</h3></li>
 				<li><h3>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.mariokramer.wsrlock.model.Document;
 import de.mariokramer.wsrlock.persistence.DocumentDao;
+import de.mariokramer.wsrlock.persistence.DocumentFeedService;
 
 /**
  * This Controller is for HTTP related AJAX Requests only.
@@ -27,6 +28,9 @@ public class MainController {
 
 	@Autowired
 	private DocumentDao docDao;
+	
+	@Autowired
+	private DocumentFeedService docWSDoa;
 	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
 	public String redirectStart(Map<String, Object> model){ 
@@ -43,32 +47,33 @@ public class MainController {
 		return "readdoc";
 	}
 	
-	@RequestMapping(value = "/changeDoc", method = RequestMethod.GET)
-	public @ResponseBody Document deleteDoc(Map<String, Object> model,
-			@RequestParam(value="task", required=true) String task,
-			@RequestParam(value="delDocId", required=false) Long docId,
-			@RequestParam(value="addDocName", required=false) String docName,
-			@RequestParam(value="addDocValue", required=false) String docValue){
-		
-		//Adding a new Document from Start.jsp page, to Database
-		if(task.equals("addDocument")){
-			Document doc = new Document(docName);
-			doc.setDocValue(docValue);
-			docDao.save(doc);
-			model.put("newDoc", docDao.findByDocName(docName));
-			log.info("New Document added to database");
-			return docDao.findByDocName(docName);
-		//Deleting a Document by given docId from the database
-		}else if (task.equals("deleteDocument")) {
-			if(docDao.findOne(docId) != null) {
-				docDao.delete(docId);
-				log.info("Document with ID-"+docId+" was deleted");
-			}else{
-				log.error("Document with ID-"+docId+" was not found in Database");
-			}
-		}else{
-			log.info("No task was given, nothing to do");
-		}
-		return null;
-	}
+//	@RequestMapping(value = "/changeDoc", method = RequestMethod.GET)
+//	public @ResponseBody Document deleteDoc(Map<String, Object> model,
+//			@RequestParam(value="task", required=true) String task,
+//			@RequestParam(value="delDocId", required=false) Long docId,
+//			@RequestParam(value="addDocName", required=false) String docName,
+//			@RequestParam(value="addDocValue", required=false) String docValue){
+//		
+//		//Adding a new Document from Start.jsp page, to Database
+//		if(task.equals("addDocument")){
+//			Document doc = new Document(docName);
+//			doc.setDocValue(docValue);
+//			docDao.save(doc);
+//			log.info("New Document added to database");
+//			
+////			docWSDoa.broadcastDocument(doc);
+//			return docDao.findByDocName(docName);
+//		//Deleting a Document by given docId from the database
+//		}else if (task.equals("deleteDocument")) {
+//			if(docDao.findOne(docId) != null) {
+//				docDao.delete(docId);
+//				log.info("Document with ID-"+docId+" was deleted");
+//			}else{
+//				log.error("Document with ID-"+docId+" was not found in Database");
+//			}
+//		}else{
+//			log.info("No task was given, nothing to do");
+//		}
+//		return null;
+//	}
 }

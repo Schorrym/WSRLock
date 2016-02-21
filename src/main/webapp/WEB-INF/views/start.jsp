@@ -2,12 +2,28 @@
 <html lang="en">
 <head>
 <%@include file="2_Head.jsp"%>
+<%@include file="3_HeadCon.jsp" %>
 <script src="resources/js/custom_ajax.js"></script>
+<script>
+// 		function leaveDoc(){
+// 			conData.docSub.unsubscribe();
+// 			conData.client.disconnect(function(){
+// 				console.log('stomp disconnect');
+// 			});
+// 		};
+// 		function handleSubscribeIncome (incoming){
+// 			var message = JSON.parse(incoming.body)
+// 			console.log('Received: ', message);
+// 		};		
+// 		var currDocId = '${currentDoc.docId}'
+// 		conData.docSub = conData.client.subscribe('/topic/start', handleSubscribeIncome);
+	</script>
 <title>Documents Overview</title>
 
 </head>
 
-<body>
+<body onload="">
+	
 	<div class="container">
 		<%@include file="5_Navbar_Start.jsp"%>
 		<section class="row">
@@ -31,7 +47,7 @@
 									<td>${doc.docName}</td>
 									<td>${doc.docValue}</td>
 									<td>
-										<a href="<c:url value="/readDoc?docId=${doc.docId}"/>" type="button" class="btn btn-primary" id="showDoc">Show</a>
+										<a onclick="showDoc()" href="<c:url value="/readDoc?docId=${doc.docId}"/>" type="button" class="btn btn-primary" id="showDoc">Show</a>
 										<a onclick="delDoc(${doc.docId})" type="button" class="btn btn-danger" id="delDocId${doc.docId}">x</a>
 									</td>
 								</tr>
@@ -56,6 +72,6 @@
 		<!-- Ende row2 -->
 	</div>
 	<!-- Ende Container -->
-	
+	<input type="hidden" id="pageName" value="start">
 </body>
 </html>

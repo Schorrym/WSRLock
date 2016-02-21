@@ -21,7 +21,8 @@
 					</h3></li>
 			</ul> -->
 			<ul class="nav navbar-nav navbar-right">
-				<li class="logout"><%@include file="6_UserLogout.jsp"%>
+				<li class="logout">
+				<%@include file="6_UserLogout.jsp"%>
 				</li>
 			</ul>
 		</div>

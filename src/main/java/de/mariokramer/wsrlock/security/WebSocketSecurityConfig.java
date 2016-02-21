@@ -11,9 +11,11 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
 	protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
 		messages.nullDestMatcher().authenticated()
 				.simpSubscribeDestMatchers("/user/queue/errors").permitAll()
-				.simpSubscribeDestMatchers("/topic/shout").permitAll()
+				.simpSubscribeDestMatchers("/topic/addDoc").permitAll()
+				.simpSubscribeDestMatchers("/topic/delDoc").permitAll()
 				.simpDestMatchers("/app/**").hasRole("USER")
 				.simpSubscribeDestMatchers("/user/**", "/topic/friends/*").hasRole("USER")
 				.anyMessage().denyAll();
-	}	
+	}
+	
 }
