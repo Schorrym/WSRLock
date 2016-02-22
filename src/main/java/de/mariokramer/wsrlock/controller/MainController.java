@@ -9,14 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.mariokramer.wsrlock.model.Document;
 import de.mariokramer.wsrlock.persistence.DocumentDao;
-import de.mariokramer.wsrlock.persistence.DocumentFeedService;
 
 /**
- * This Controller is for HTTP related AJAX Requests only.
+ * This Controller is for HTTP related redirect Requests only.
  * No WebSocket implementation here
  * @author Mario Kramer
  *
@@ -29,13 +27,18 @@ public class MainController {
 	@Autowired
 	private DocumentDao docDao;
 	
-	@Autowired
-	private DocumentFeedService docWSDoa;
-	
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
-	public String redirectStart(Map<String, Object> model){ 
+	public String redirectStart(Map<String, Object> model){ 		
+		//Shorten the documents value for the preview
+		Iterable<Document> docs = docDao.findAll();
+		for(Document doc : docs){
+			if(doc.getDocValue().length() > 64){
+				String docValue = doc.getDocValue().substring(0, 32);
+				doc.setDocValue(docValue + "...");
+			}			
+		}
 		//All Documents will be transmitted to the start.jsp page
-		model.put("documents", docDao.findAll());
+		model.put("documents", docs);
 		
 		return "start";
 	}

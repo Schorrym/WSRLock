@@ -17,7 +17,7 @@ public class Document {
 	private Long docId;	
 	@Column(name="docName", nullable=false)
 	private String docName;
-	@Column(name="docValue")
+	@Column(name="docValue", columnDefinition = "text")
 	private String docValue;
 	
 	public Document(String docName) {

@@ -28,14 +28,15 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	
 	@Override
 	public void specificDocumentSubscription(Document doc) {
-		if(doc.getDocId() != null){
-			messaging.convertAndSend("/topic/doc"+doc.getDocId(), doc);
-		}
+//		if(doc.getDocId() != null){
+//			messaging.convertAndSend("/topic/doc"+doc.getDocId(), doc);
+//		}
 	}
 
 	@Override
 	public void lockDockument(Document doc) {
-		// TODO Auto-generated method stub
-		
+		if(doc.getDocId() != null){
+			messaging.convertAndSend("/topic/doc"+doc.getDocId(), doc);
+		}
 	}	
 }

@@ -3,21 +3,17 @@
 <head>
 <%@include file="2_Head.jsp"%>
 
-<script src="resources/js/custom_ajax.js"></script>
-
 <title>Documents Overview</title>
 
 </head>
 
 <body onload="">
-	
+	<%@include file="4_Navbar.jsp"%>
 	<div class="container">
-		<%@include file="5_Navbar_Start.jsp"%>
 		<section class="row">
-			<div class="col-sm-12 col-md-12">
+			<div class="col-xs-18 col-sm-12 col-lg-12">
 				<div class="table-responsive">
 				<c:url value="/addDoc" var="addDocUrl" />
-				<!-- <form class="form-add-doc" name="addDocForm" action="${addDocUrl}" method="POST"> -->
 					<table class="table table-striped" id="docTable">
 						<thead>
 							<tr>
@@ -60,6 +56,7 @@
 	</div>
 	<!-- Ende Container -->
 	<input type="hidden" id="pageName" value="start">
+	<input type="hidden" id="sessionId" value="${pageContext.session.id}">
 </body>
 <%@include file="3_HeadCon.jsp" %>
 </html>

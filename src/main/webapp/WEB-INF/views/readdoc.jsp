@@ -1,28 +1,26 @@
 <%@include file="1_Top.jsp" %>
-<html lang="en">
+<html>
   <head>
-    <%@include file="2_Head.jsp" %>
-
-	<title>Viewing document</title>
+    <%@include file="2_Head.jsp" %>	
+	<title>Editing document</title>
   </head>
     
-  <body onload="">  
-  	<%@include file="4_Navbar_Read.jsp" %>
+  <body>  
+  	<%@include file="4_Navbar.jsp" %>
 		<div class="container">	
 	    <section class="row">
 			<div class="col-sm-12 col-md-12">
-				<span class="label label-default" id="docname">Document: ${currentDoc.docName}</span>
-				<form role="form">
-					<div class="form-group">
-						<textarea  onkeyup="textAreaAdjust(this)" style="overflow:visible" class="form-control" readonly>
-						${currentDoc.docValue}
-						</textarea>
-					</div>
-				</form>
+				<div class="form-group">
+					<label for="docContent" class="label label-default" id="doc${currentDoc.docId}">Document: ${currentDoc.docName}</label>
+					<textarea  class="form-control" id="docContent" disabled>${currentDoc.docValue}</textarea>					
+				</div>
 			</div>
 		</section>
 		</div>
+		<!-- Params to parse to javascript -->
 		<input type="hidden" id="pageName" value="readdoc">
+		<input type="hidden" id="docId" value="${currentDoc.docId}">
+		<input type="hidden" id="sessionId" value="${pageContext.session.id}">
 	</body>
 	<%@include file="3_HeadCon.jsp" %>
 </html>

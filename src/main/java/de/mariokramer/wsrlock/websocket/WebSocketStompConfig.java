@@ -15,6 +15,11 @@ public class WebSocketStompConfig extends AbstractWebSocketMessageBrokerConfigur
 		registry.addEndpoint("/readDocument").withSockJS();
 	}
 	
+//	@Override
+//	public void configureStompEndpoints(StompEndpointRegistry registry) {
+//		registry.addEndpoint("/readDocument").withSockJS();
+//	}
+	
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 //		registry.enableStompBrokerRelay("/queue", "/topic");
