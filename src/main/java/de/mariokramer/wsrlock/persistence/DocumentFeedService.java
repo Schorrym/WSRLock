@@ -6,5 +6,5 @@ public interface DocumentFeedService {
 	public void broadcastDocument(Document doc);
 	public void deleteDocument(Long id);
 	public void specificDocumentSubscription(Document doc);
-	public void lockDockument(Document doc);
+	public void lockDockument(Long docId, Document doc);
 }

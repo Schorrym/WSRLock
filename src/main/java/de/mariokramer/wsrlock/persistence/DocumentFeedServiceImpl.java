@@ -34,9 +34,7 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	}
 
 	@Override
-	public void lockDockument(Document doc) {
-		if(doc.getDocId() != null){
-			messaging.convertAndSend("/topic/doc"+doc.getDocId(), doc);
-		}
+	public void lockDockument(Long docId, Document doc) {
+		messaging.convertAndSend("/topic/doc"+docId, doc);
 	}	
 }

@@ -1,14 +1,12 @@
 package de.mariokramer.wsrlock.controller;
 
 import java.security.Principal;
-import java.sql.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
 import de.mariokramer.wsrlock.model.Document;
@@ -42,8 +40,8 @@ public class WebSocketController {
 		Document newDoc = docDao.findOne(doc.getDocId());
 		newDoc.setDocValue(doc.getDocValue());
 		docDao.save(newDoc);
-		
-		resLockDao.deleteAll();
+		docWebSocketService.lockDockument(newDoc.getDocId(), newDoc);
+		resLockDao.deleteByDocId(newDoc.getDocId());
 		
 		return newDoc;
 	}
@@ -52,7 +50,7 @@ public class WebSocketController {
 	@SendToUser("/queue/lockSuccess")
 	public DocumentResourceLock editDoc(Document doc, Principal principal){
 		doc = docDao.findOne(doc.getDocId());
-		if(resLockDao.findLockIdByLockingDoc(doc) != null){
+		if(resLockDao.existsByDocId(doc.getDocId())){
 			log.error("Requested source is already in locking table. Check the resource lock table for that document and delete it");
 		}else{
 			DocumentResourceLock docLock = null;
@@ -61,7 +59,7 @@ public class WebSocketController {
 				docLock = new DocumentResourceLock(doc);
 				docLock.setUserName(principal.getName());
 				docLock.setTempDocValue(doc.getDocValue());
-				docWebSocketService.lockDockument(doc);
+				docWebSocketService.lockDockument(doc.getDocId(), new Document());
 			}
 			resLockDao.save(docLock);
 			return docLock;

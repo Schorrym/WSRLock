@@ -1,14 +1,15 @@
 package de.mariokramer.wsrlock.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="resourcelock")
@@ -19,8 +20,8 @@ public class DocumentResourceLock {
 	@Column(name="lockId")
 	private Long lockId;
 	
-	@ManyToOne
-	private Document lockingDoc;
+	@Column(name="docId")
+	private Long docId;
 	
 	@Column(name="tempDocValue", columnDefinition = "text")
 	private String tempDocValue;
@@ -31,6 +32,7 @@ public class DocumentResourceLock {
 	private String sessionId;
 	
 	@Column(name="datetime", insertable=false, updatable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date datetime;
 
 	/*
@@ -38,19 +40,19 @@ public class DocumentResourceLock {
 	 */
 	public DocumentResourceLock() {}
 	public DocumentResourceLock(Document doc) {
-		this.setLockingDoc(doc);
+		this.setDocId(doc.getDocId());
 	}
 	
 	public Long getLockId() {
 		return lockId;
 	}
 
-	public Document getLockingDoc() {
-		return lockingDoc;
+	public Long getDocId() {
+		return docId;
 	}
 
-	public void setLockingDoc(Document lockingDoc) {
-		this.lockingDoc = lockingDoc;
+	public void setDocId(Long docId) {
+		this.docId = docId;
 	}
 
 	public String getUserName() {

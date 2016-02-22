@@ -76,12 +76,19 @@ function handleSaveSuccessSubscribeIncome(incoming){
 
 //Handles the message from the server after requesting editing the document
 function handleEditDocSubscribeIncome(incoming) {
-	$("#docContent").prop("disabled", true);
-	$("#editButton").prop("disabled", true);	
-	$("#status").text("writing");
 	var lockDoc = JSON.parse(incoming.body);
 	
-	console.log('Document is now locked');
+	//Zum abriegeln der view
+	if(lockDoc.docId == null){
+		$("#editButton").attr("onclick", "");	
+		$("#status").text("writing");
+		console.log('Document is now locked');
+	}else{
+		$("#editButton").attr("onclick", "editDoc()");	
+		$("#status").text("reading");
+		$("#docContent").val(lockDoc.docValue);
+		console.log('Document was unlocked');
+	}	
 }
 
 function handleLockSuccessSubscribeIncome(incoming){

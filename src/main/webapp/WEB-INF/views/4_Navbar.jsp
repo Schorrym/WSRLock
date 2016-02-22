@@ -22,7 +22,7 @@
 			<c:if test="${fn:contains(pageContext.request.requestURI, '/readdoc.jsp') }">
 			<ul class="nav navbar-nav">
 				<li><h3>
-					<a onclick="editDoc()" type="button" class="btn btn-default" id="editButton" hidden="true">edit</a>
+					<a onclick="editDoc()" type="button" class="btn btn-default" id="editButton">edit</a>
 				</h3></li>				
 				<li><h3>
 					<a href="#" type="button" class="btn btn-default" id="members">members</a>
