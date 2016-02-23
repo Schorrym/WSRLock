@@ -1,5 +1,5 @@
 <%@include file="1_Top.jsp"%>
-<html lang="en">
+<html>
 <head>
 <%@include file="2_Head.jsp"%>
 
@@ -13,7 +13,6 @@
 		<section class="row">
 			<div class="col-xs-18 col-sm-12 col-lg-12">
 				<div class="table-responsive">
-				<c:url value="/addDoc" var="addDocUrl" />
 					<table class="table table-striped" id="docTable">
 						<thead>
 							<tr>

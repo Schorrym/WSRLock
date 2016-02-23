@@ -31,7 +31,7 @@ public class DocumentResourceLock {
 	@Column(name="sessionId", length=32)
 	private String sessionId;
 	
-	@Column(name="datetime", insertable=false, updatable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name="datetime", updatable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date datetime;
 

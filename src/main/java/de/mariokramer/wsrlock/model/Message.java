@@ -11,14 +11,7 @@ public class Message {
 
 	private String task;
 	private Long docId;
-	private String notify;
 	
-	public String getNotify() {
-		return notify;
-	}
-	public void setNotify(String notify) {
-		this.notify = notify;
-	}
 	public String getTask() {
 		return task;
 	}
@@ -31,6 +24,4 @@ public class Message {
 	public void setDocId(String docId) {
 		this.docId =  Long.valueOf(docId);
 	}
-
-
 }

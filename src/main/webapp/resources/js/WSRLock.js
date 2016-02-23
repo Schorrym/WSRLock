@@ -16,6 +16,8 @@ var csrfToken = $("meta[name='_csrf']").attr("content");
 var headers = {
       login: 'guest',
       passcode: 'guest',
+      currDocId: $("#docId").val(),
+      sessionId: $("#sessionId").val(),
 };
 headers[csrfHeader] = csrfToken;
 
@@ -23,12 +25,15 @@ headers[csrfHeader] = csrfToken;
 conData.client.connect(headers, function(frame){
 	var pageName = $("#pageName").val();
 	var httpSession = $("#sessionId").val();
-	if(pageName == "start"){		
-		conData.delDocSub = conData.client.subscribe('/topic/delDoc', handleDelDocSubscribeIncome, { id: httpSession});
-		conData.addDocSub = conData.client.subscribe('/topic/addDoc', handleAddDocSubscribeIncome, { id: httpSession});
+	if(pageName == "start"){	
+		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
+		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
 	}else if(pageName == "readdoc"){
 		var currDocId = $("#docId").val();
-		conData.docSub = conData.client.subscribe('/topic/doc'+currDocId, handleEditDocSubscribeIncome, { id: httpSession});
+		conData.docSub = sub('topic', 'doc'+currDocId, handleEditDocBroadcast);
+		conData.checkSub = sub('topic', 'checkDoc', handleCheckDoc);
+		var docId = JSON.stringify({'docId': currDocId});
+		conData.client.send("/app/checkDoc", {}, docId);
 	}
 });
 
@@ -39,6 +44,41 @@ function disconnect(){
 	});
 };
 
+//Client-Server -- When a request for Document editing is placed (by clicking the edit button)
+function editDoc(){
+	conData.docSub.unsubscribe();
+	conData.lockSub = sub('user', 'lockSuccess', handleLockSuccessIncome);
+	conData.saveSub = sub('user', 'saveSuccess', handleSaveSuccessIncome);
+	
+	var currDocId = $("#docId").val();
+	var editDoc = JSON.stringify({'docId': currDocId});
+	conData.client.send("/app/editDoc", {}, editDoc);
+};
+
+function lockView(){
+	$("#editButton").attr("onclick", "");	
+	$("#status").text("writing");
+	console.log('Document is now locked');
+};
+
+function freeView(doc){
+	$("#editButton").attr("onclick", "editDoc()");	
+	$("#status").text("reading");
+	$("#docContent").val(doc.docValue);
+	console.log('Document was unlocked');
+};
+
+//Server->Client -- Handles the message from the server after requesting editing the document
+function handleEditDocBroadcast(incoming) {
+	var lockDoc = JSON.parse(incoming.body);
+	if(incoming == null){
+		lockView();
+	}else{		
+		freeView(lockDoc);
+	}	
+};
+
+//Client->Server -- When adding a new document on start.jsp page. New document is sent to the server
 function saveDoc(){
 	var docId = $("#docId").val();
 	var docValue = $("#docContent").val();
@@ -48,18 +88,8 @@ function saveDoc(){
 	conData.client.send("/app/saveDoc", {}, savedDoc);
 };
 
-//When a request for Document editing is placed (by clicking the edit button)
-function editDoc(){
-	conData.docSub.unsubscribe();
-	conData.lockSub = conData.client.subscribe('/user/queue/lockSuccess', handleLockSuccessSubscribeIncome)
-	conData.saveSub = conData.client.subscribe('/user/queue/saveSuccess', handleSaveSuccessSubscribeIncome)
-	
-	var currDocId = $("#docId").val();
-	var editDoc = JSON.stringify({'docId': currDocId});
-	conData.client.send("/app/editDoc", {}, editDoc);
-};
-
-function handleSaveSuccessSubscribeIncome(incoming){
+//Server->Client -- Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
+function handleSaveSuccessIncome(incoming){
 	conData.lockSub.unsubscribe();
 	conData.saveSub.unsubscribe();
 	$("#docContent").prop("disabled", true);
@@ -70,28 +100,12 @@ function handleSaveSuccessSubscribeIncome(incoming){
 	var lockDoc = JSON.parse(incoming.body);
 	var httpSession = $("#sessionId").val();
 	var currDocId = $("#docId").val();
-	conData.docSub = conData.client.subscribe('/topic/doc'+currDocId, handleEditDocSubscribeIncome, { id: httpSession});
+	conData.docSub = sub('topic', 'doc'+currDocId, handleEditDocBroadcast); 
 	console.log('document was saved');
 };
 
-//Handles the message from the server after requesting editing the document
-function handleEditDocSubscribeIncome(incoming) {
-	var lockDoc = JSON.parse(incoming.body);
-	
-	//Zum abriegeln der view
-	if(lockDoc.docId == null){
-		$("#editButton").attr("onclick", "");	
-		$("#status").text("writing");
-		console.log('Document is now locked');
-	}else{
-		$("#editButton").attr("onclick", "editDoc()");	
-		$("#status").text("reading");
-		$("#docContent").val(lockDoc.docValue);
-		console.log('Document was unlocked');
-	}	
-}
-
-function handleLockSuccessSubscribeIncome(incoming){
+//Server-Client -- Handles message from the Server when locking a document has succeeded (no broadcast, user unique)
+function handleLockSuccessIncome(incoming){
 	$("#docContent").prop("disabled", false);
 	$("#editButton").hide();
 	$("#exit").hide();
@@ -100,8 +114,7 @@ function handleLockSuccessSubscribeIncome(incoming){
 	var lockDoc = JSON.parse(incoming.body);
 	
 	console.log('Document is locked for you: '+lockDoc);	
-}
-
+};
 
 //When clicking the 'leav document' button on a specific document
 function leaveDoc(){
@@ -116,13 +129,20 @@ function showDoc(){
 	disconnect();
 };
 
-//When deleting adocument on start page
+//Client->Server -- When deleting a document on start.jsp page
 function delDoc(docId){
 	var delDoc = JSON.stringify({'docId': docId});
 	conData.client.send("/app/delDoc", {}, delDoc);
 };
 
-//When adding a document on the start page
+//Server->Client -- Handles the message from server after deleting a document
+function handleDelDocBroadcast(incoming) {
+	var docId = JSON.parse(incoming.body);
+	$("#delDocId"+docId).closest('tr').remove();
+	console.log('Deleted document with ID: '+docId+' from database');
+};
+
+//Client->Server -- When adding a document on the start page
 function addDoc(){	
 	var docName = $("#docName").val();
 	var docValue = $("#docValue").val();
@@ -130,19 +150,10 @@ function addDoc(){
 		  						 'docValue': docValue
 		  			});
 	conData.client.send("/app/addDoc", {}, newDoc);
-};		
-
-
-
-//Handles the message from server after deleting a document
-function handleDelDocSubscribeIncome(incoming) {
-	var docId = JSON.parse(incoming.body);
-	$("#delDocId"+docId).closest('tr').remove();
-	console.log('Deleted document with ID: '+docId+' from database');
 };
 
-//Handles the message from server after adding a new document
-function handleAddDocSubscribeIncome(incoming){
+//Server->Client -- Handles the message from server after adding a new document
+function handleAddDocBroadcast(incoming){
 	var message = JSON.parse(incoming.body);
 
 	//Create Show Button			
@@ -181,4 +192,28 @@ $(function(){
 //Will perfom Logout with corresponding Form with name "logoutForm"
 function formSubmit() {
 	document.getElementById("logoutForm").submit();
+};
+
+//Subscribing events. Returns a new subscription
+function sub(type, url, callback){
+	if(type == 'user'){
+		return conData.client.subscribe('/user/queue/'+url, callback);
+	}else if(type == 'topic'){
+		return conData.client.subscribe('/topic/'+url, callback);
+	}else if(type == 'app'){
+		return conData.client.subscribe('/app/'+url, callback);
+	}else if(type == 'new'){
+		return conData.client.subscribe(url, callback);
+	}else{
+		return null;
+	}
+};
+
+//Server-Client -- Check at the beginning of the document if it is locked in database
+function handleCheckDoc(incoming){
+	var message = JSON.parse(incoming.body);
+	console.log(message.task);
+	if(message.task == "lockView"){
+		lockView();
+	}	
 };

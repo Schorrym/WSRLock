@@ -1,5 +1,6 @@
 package de.mariokramer.wsrlock.websocket;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
@@ -14,6 +15,8 @@ public class WebSocketStompConfig extends AbstractWebSocketMessageBrokerConfigur
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/readDocument").withSockJS();
 	}
+	
+	
 	
 //	@Override
 //	public void configureStompEndpoints(StompEndpointRegistry registry) {
