@@ -30,7 +30,7 @@ conData.client.connect(headers, function(frame){
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
 	}else if(pageName == "readdoc"){
 		var currDocId = $("#docId").val();
-		conData.docSub = sub('topic', 'doc'+currDocId, handleEditDocBroadcast);
+		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
 		conData.checkSub = sub('topic', 'checkDoc', handleCheckDoc);
 		var docId = JSON.stringify({'docId': currDocId});
 		conData.client.send("/app/checkDoc", {}, docId);
@@ -69,8 +69,12 @@ function freeView(doc){
 };
 
 //Server->Client -- Handles the message from the server after requesting editing the document
-function handleEditDocBroadcast(incoming) {
+function handleDocBroadcast(incoming) {
+	var payload = JSON.parse(incoming.body.payload);
+	var task = JSON.parse(incoming.headers.nativeHeaders.task);
+	console.log("task: "+task);
 	var lockDoc = JSON.parse(incoming.body);
+	console.log(incoming);
 	if(incoming == null){
 		lockView();
 	}else{		
@@ -89,7 +93,7 @@ function saveDoc(){
 };
 
 //Server->Client -- Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
-function handleSaveSuccessIncome(incoming){
+function handleSaveSuccessIncome(incoming){	
 	conData.lockSub.unsubscribe();
 	conData.saveSub.unsubscribe();
 	$("#docContent").prop("disabled", true);
@@ -97,10 +101,9 @@ function handleSaveSuccessIncome(incoming){
 	$("#exit").show();
 	$("#save").hide();
 	$("#status").text("reading");
-	var lockDoc = JSON.parse(incoming.body);
 	var httpSession = $("#sessionId").val();
 	var currDocId = $("#docId").val();
-	conData.docSub = sub('topic', 'doc'+currDocId, handleEditDocBroadcast); 
+	conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast); 
 	console.log('document was saved');
 };
 
@@ -211,9 +214,13 @@ function sub(type, url, callback){
 
 //Server-Client -- Check at the beginning of the document if it is locked in database
 function handleCheckDoc(incoming){
-	var message = JSON.parse(incoming.body);
-	console.log(message.task);
-	if(message.task == "lockView"){
-		lockView();
-	}	
+//	var payload = JSON.parse(incoming);
+	console.log("Hi "+incoming[payload]);
+//	var task = JSON.parse(incoming.headers.nativeHeaders.task);
+//	console.log("task: "+task);
+//	var message = JSON.parse(incoming.payload.docId);
+//	console.log("HIER: "+payload);
+//	if(message.task == "lockView"){
+//		lockView();
+//	}	
 };

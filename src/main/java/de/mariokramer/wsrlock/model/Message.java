@@ -7,11 +7,18 @@ package de.mariokramer.wsrlock.model;
  * @author Mario Kramer
  *
  */
-public class Message {
+public class Message{
 
 	private String task;
 	private Long docId;
+	private String userName;
 	
+	public String getUser() {
+		return userName;
+	}
+	public void setUser(String user) {
+		this.userName = user;
+	}
 	public String getTask() {
 		return task;
 	}

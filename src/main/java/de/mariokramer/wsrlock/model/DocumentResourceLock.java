@@ -7,9 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="resourcelock")
@@ -20,61 +22,57 @@ public class DocumentResourceLock {
 	@Column(name="lockId")
 	private Long lockId;
 	
-	@Column(name="docId")
-	private Long docId;
+	@JoinColumn(name="docUsers")
+	@ManyToOne
+	private DocUsers docUsers;
 	
 	@Column(name="tempDocValue", columnDefinition = "text")
 	private String tempDocValue;
 		
-	@Column(name="userName")
-	private String userName;
-	@Column(name="sessionId", length=32)
-	private String sessionId;
+	@Column(name="dateCreated", updatable=false, insertable=false)
+	private Date dateCreated;
 	
-	@Column(name="datetime", updatable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date datetime;
+	@Column(name="lastModified", updatable=false, insertable=false)
+	private Date lastModified;
 
+	@PreUpdate
+	@PrePersist
+	public void updateTimeStamps(){
+		lastModified = new Date();
+		if(dateCreated==null){
+			dateCreated = new Date();
+		}
+	}
+	
 	/*
 	 * Constructor with or without document as parameter
 	 */
 	public DocumentResourceLock() {}
-	public DocumentResourceLock(Document doc) {
-		this.setDocId(doc.getDocId());
+	public DocumentResourceLock(DocUsers docUsers) {
+		this.setDocUsers(docUsers);
 	}
 	
+	public DocUsers getDocUsers() {
+		return docUsers;
+	}
+
+	public void setDocUsers(DocUsers docUsers) {
+		this.docUsers = docUsers;
+	}
+
 	public Long getLockId() {
 		return lockId;
 	}
 
-	public Long getDocId() {
-		return docId;
+
+	public Date getDateCreated() {
+		return dateCreated;
 	}
 
-	public void setDocId(Long docId) {
-		this.docId = docId;
+	public Date getLastModified() {
+		return lastModified;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	public Date getDatetime() {
-		return datetime;
-	}
-	
 	public String getTempDocValue() {
 		return tempDocValue;
 	}
