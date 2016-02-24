@@ -12,7 +12,7 @@ public interface DocumentFeedService {
 	public void deleteDocument(Long id);
 	
 	//Broadcasts on read page
-	public void broadcastUsers(Long docId, List<Users> users, String task);
-	public void lockDockument(Long docId, Message msg, String task);
-	public void saveDocument(Long docId, Document newDoc, String task);
+	public void broadcastUsers(Long docId, Message<List<Users>> users);
+	public void lockDockument(Long docId, Message<Document> msg);
+	public void saveDocument(Long docId, Message<Document> newDoc);
 }

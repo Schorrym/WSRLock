@@ -32,8 +32,8 @@ conData.client.connect(headers, function(frame){
 		var currDocId = $("#docId").val();
 		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
 		conData.checkSub = sub('topic', 'checkDoc', handleCheckDoc);
-		var docId = JSON.stringify({'docId': currDocId});
-		conData.client.send("/app/checkDoc", {}, docId);
+		var task = JSON.stringify({'task': currDocId});
+		conData.client.send("/app/checkDoc", {}, task);
 	}
 });
 
@@ -51,7 +51,7 @@ function editDoc(){
 	conData.saveSub = sub('user', 'saveSuccess', handleSaveSuccessIncome);
 	
 	var currDocId = $("#docId").val();
-	var editDoc = JSON.stringify({'docId': currDocId});
+	var editDoc = JSON.stringify({'task': currDocId});
 	conData.client.send("/app/editDoc", {}, editDoc);
 };
 
@@ -70,16 +70,18 @@ function freeView(doc){
 
 //Server->Client -- Handles the message from the server after requesting editing the document
 function handleDocBroadcast(incoming) {
-	var payload = JSON.parse(incoming.body.payload);
-	var task = JSON.parse(incoming.headers.nativeHeaders.task);
-	console.log("task: "+task);
-	var lockDoc = JSON.parse(incoming.body);
-	console.log(incoming);
-	if(incoming == null){
+	var payload = JSON.parse(incoming.body);
+	var object = payload.object;
+	var task = payload.task;
+	if(task == "lockView"){
 		lockView();
-	}else{		
-		freeView(lockDoc);
-	}	
+	}else if(task == "newDoc"){		
+		freeView(object);
+	}else if(task == "userUpdate"){
+		for (var i = 0; i < object.length; i++) {
+			console.log("BENUTZER: "+object[i].userName);			
+		}		
+	}
 };
 
 //Client->Server -- When adding a new document on start.jsp page. New document is sent to the server
@@ -101,7 +103,6 @@ function handleSaveSuccessIncome(incoming){
 	$("#exit").show();
 	$("#save").hide();
 	$("#status").text("reading");
-	var httpSession = $("#sessionId").val();
 	var currDocId = $("#docId").val();
 	conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast); 
 	console.log('document was saved');
@@ -109,19 +110,22 @@ function handleSaveSuccessIncome(incoming){
 
 //Server-Client -- Handles message from the Server when locking a document has succeeded (no broadcast, user unique)
 function handleLockSuccessIncome(incoming){
+	var lockDoc = JSON.parse(incoming.body);
+	
 	$("#docContent").prop("disabled", false);
 	$("#editButton").hide();
 	$("#exit").hide();
 	$("#save").show();
-	$("#status").text("writing");
-	var lockDoc = JSON.parse(incoming.body);
+	$("#status").text("writing");	
 	
-	console.log('Document is locked for you: '+lockDoc);	
+	console.log('Document is locked for you: '+lockDoc.task);	
 };
 
 //When clicking the 'leav document' button on a specific document
 function leaveDoc(){
 	conData.docSub.unsubscribe();
+	var leave = JSON.stringify({'task': $("#docId").val()});
+	conData.client.send("/app/leaveDoc", {}, leave)
 	disconnect();
 };
 
@@ -214,13 +218,11 @@ function sub(type, url, callback){
 
 //Server-Client -- Check at the beginning of the document if it is locked in database
 function handleCheckDoc(incoming){
-//	var payload = JSON.parse(incoming);
-	console.log("Hi "+incoming[payload]);
-//	var task = JSON.parse(incoming.headers.nativeHeaders.task);
-//	console.log("task: "+task);
-//	var message = JSON.parse(incoming.payload.docId);
-//	console.log("HIER: "+payload);
-//	if(message.task == "lockView"){
-//		lockView();
-//	}	
+	var message = JSON.parse(incoming.body);
+
+	if(message.task == "lockView"){
+		lockView();
+	}else if(message.task == "writeMode"){
+		//ToDo
+	}
 };

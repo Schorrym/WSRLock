@@ -3,12 +3,14 @@ package de.mariokramer.wsrlock.controller;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -24,6 +26,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import de.mariokramer.wsrlock.model.DocUsers;
 import de.mariokramer.wsrlock.model.Document;
 import de.mariokramer.wsrlock.model.DocumentResourceLock;
+import de.mariokramer.wsrlock.model.Message;
 import de.mariokramer.wsrlock.model.Message;
 import de.mariokramer.wsrlock.model.Users;
 import de.mariokramer.wsrlock.persistence.DocUsersDao;
@@ -55,7 +58,7 @@ public class WebSocketController {
 	
 	@MessageMapping("/checkDoc")
 	@SendTo("/topic/checkDoc")
-	public GenericMessage checkDoc(Message msg, Principal p, StompHeaderAccessor s){
+	public Message<DocumentResourceLock> checkDoc(Message<DocumentResourceLock> msg, Principal p, StompHeaderAccessor s){
 		//Check whether user already exists or not
 		Users user = null;
 		if(userDao.existsByUserName(p.getName())){
@@ -69,7 +72,7 @@ public class WebSocketController {
 		userDao.save(user);
 		
 		//Check whether document-users combination already exists or not
-		Long docId = msg.getDocId();
+		Long docId = Long.valueOf(msg.getTask());
 		Document doc = docDao.findOne(docId);
 		DocUsers du = null;
 		if(!docUserDao.existsByUser(user, doc)){
@@ -86,50 +89,61 @@ public class WebSocketController {
 			if(rl.getDocUsers().getUser().getUserId() == user.getUserId()){
 				msg.setTask("writeMode");
 			}
-			msg.setUser(user.getUserName());
+			msg.setObject(rl);
 		}		
-		s.setNativeHeader("bitch", "value");
-		Map headers = new HashMap<>();
-		headers.put("furz", "kot");
-		return new GenericMessage("foo", headers);
+		List<DocUsers> dus = docUserDao.findAllByDoc(doc);
+		LinkedList<Users> users = new LinkedList<Users>(); 
+		for(DocUsers user1 : dus){
+			users.add(userDao.findOne(user1.getUser().getUserId()));
+		}
+		docWebSocketService.broadcastUsers(docId, new Message<List<Users>>(users,"userUpdate"));
+		return msg;
+	}
+	
+	@MessageMapping("/leaveDoc")
+	public void leaveDoc(Message<List<Users>> msg, Principal p){
+		Document doc = docDao.findOne(Long.valueOf(msg.getTask()));
+		Users user = userDao.findOneByUserName(p.getName());
+		DocUsers du = new DocUsers(doc, user);
+		docUserDao.delete(du);
+		msg.setTask("userUpdate");
+		docWebSocketService.broadcastUsers(doc.getDocId(), msg);
 	}
 	
 	@MessageMapping("/saveDoc")
 	@SendToUser("/queue/saveSuccess")
-	public void saveDoc(Document doc, Principal p){		
+	public Document saveDoc(Document doc, Principal p){		
 		Document newDoc = docDao.findOne(doc.getDocId());
 		Users user = userDao.getUsersByUserName(p.getName());
 		newDoc.setDocValue(doc.getDocValue());
 		docDao.save(newDoc);
-		docWebSocketService.saveDocument(newDoc.getDocId(), newDoc, "newDoc");
+		docWebSocketService.saveDocument(newDoc.getDocId(), new Message<Document>(newDoc, "newDoc"));
 		resLockDao.deleteByDocUsers(docUserDao.findOneByUserAndDoc(user, newDoc));
+		
+		return newDoc;
 	}
 		
 	@MessageMapping("/editDoc")
 	@SendToUser("/queue/lockSuccess")
-	public DocumentResourceLock editDoc(Document doc, Principal p, SimpMessageHeaderAccessor header){
-		Message msg = new Message();
-		doc = docDao.findOne(doc.getDocId());
+	public Message<DocumentResourceLock> editDoc(Message<Document> doc, Principal p, SimpMessageHeaderAccessor header){
+		doc.setObject(docDao.findOne(Long.valueOf(doc.getTask())));
 		Users user = userDao.findOneByUserName(p.getName());
-		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
-		
+		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc.getObject());
+		DocumentResourceLock docLock = null;
 		if(resLockDao.existsByDocUsers(du)){
 			log.error("Requested source is already in locking table. Check the resource lock table for that document and delete it");
-		}else{
-			DocumentResourceLock docLock = null;
-			log.info("Document: " + doc.getDocName() + " is now locked for user: " + p.getName());
-			msg.setDocId(doc.getDocId().toString());
-			msg.setTask("lockView");
-			msg.setUser(p.getName());
+		}else{			
+			log.info("Document: " + doc.getObject().getDocName() + " is now locked for user: " + p.getName());
+			doc.setTask("lockView");
 			synchronized (doc) {				
 				docLock = new DocumentResourceLock(du);
-				docLock.setTempDocValue(doc.getDocValue());
-				docWebSocketService.lockDockument(doc.getDocId(), msg, "lockView");
+				docLock.setTempDocValue(doc.getObject().getDocValue());
+				docWebSocketService.lockDockument(doc.getObject().getDocId(), doc);
 			}
 			resLockDao.save(docLock);
-			return docLock;
 		}
-		return null;
+		Message<DocumentResourceLock> msg = new Message<DocumentResourceLock>(docLock, p.getName());
+		return msg;
 	}
 	
 	@MessageMapping("/delDoc")
