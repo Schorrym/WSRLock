@@ -115,26 +115,32 @@ function saveDoc(){
 	conData.client.send("/app/saveDoc", {}, savedDoc);
 };
 
+//auto save the value of textarea while in writemode of a document
+function autoSave(){
+	var autoValue = JSON.stringify({'docId': $("#docId").val(),
+									'docValue': $("#docContent").val()});
+	conData.client.send("/app/autoSave", {}, autoValue);
+	return;
+};
+
 //Server-Client -- Handles messages from the Server to the user who locked a document
 function handleLockIncome(incoming){
 	var payload = JSON.parse(incoming.body);
 	var object = payload.object;
 	var task = payload.task;
-	function autoSave(){
-		var autoValue = JSON.stringify({'docId': $("#docId").val(),
-										'docValue': $("#docContent").val()});
-		conData.client.send("/app/autoSave", {}, autoValue);
-	}
+	
 	//Handles message from the Server when locking a document has succeeded (no broadcast, user unique)
-	if(task == "lockDoc"){
-		interval = setInterval( autoSave(), 20000 );		
-		console.log("locDoc: "+object);		
+	if(task == "lockDoc" || task == "writeMode"){
+		if(task == "writeMode"){
+			$("#docContent").val(object['tempDocValue']);
+		}
+		conData.interval = setInterval( autoSave, 20000 );		
 		$("#docContent").prop("disabled", false);
 		$("#editButton").hide();
 		$("#exit").hide();
 		$("#save").show();
-		$("#status").text("writing");		
-		console.log('Document is locked for you: '+object);
+		$("#status").text("writing");
+		console.log('Document is locked for you: '+object['docUsers']['user']['userName']);
 	//Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
 	}else if(task == "docSaved"){
 		conData.lockSub.unsubscribe();
@@ -145,7 +151,7 @@ function handleLockIncome(incoming){
 		$("#status").text("reading");
 		var currDocId = $("#docId").val();
 		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
-		clearInterval(interval);
+		clearInterval(conData.interval);
 		console.log('document was saved');
 	}else if(task == "userUpdate"){
 		userUpdate(object);

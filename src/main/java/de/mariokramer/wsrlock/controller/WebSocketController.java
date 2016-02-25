@@ -80,7 +80,7 @@ public class WebSocketController{
 		DocumentResourceLock rl = resLockDao.findOneByDocUsers(du);
 		if(rl != null){
 			drl.setTask("lockView");
-			if(rl.getDocUsers().getUser().getUserName() == p.getName()){
+			if(rl.getDocUsers().getUser().getUserName().equals(p.getName())){
 				drl.setTask("writeMode");
 			}
 			drl.setObject(rl);
@@ -145,7 +145,7 @@ public class WebSocketController{
 		doc = docDao.findOne(doc.getDocId());
 		Users user = userDao.findOneByUserName(p.getName());
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
-		DocumentResourceLock drl = new DocumentResourceLock(du);
+		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
 		Message<DocumentResourceLock> messageDrl = new Message<>();
 		
 		//If current document and current user can be found in locking table
