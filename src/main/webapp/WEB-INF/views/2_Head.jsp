@@ -6,7 +6,6 @@
 <!-- Bootstrap -->
 <link href="resources/css/bootstrap.css" rel="stylesheet">
 <!-- JQuery -->
-<script src="resources/js/jquery-2.1.4.min.js"></script>
-<script src="resources/js/jquery-ui.min.js"></script>
+<script src="resources/js/jquery-2.2.1.min.js"></script>
 <!-- Plugin for jQuery to resize textarea elements -->
 <script src='resources/js/jquery.autosize.min.js'></script>

@@ -10,10 +10,21 @@
 		<div class="container">	
 	    <section class="row">
 			<div class="col-sm-12 col-md-12">
-				<div class="form-group">
-					<label for="docContent" class="label label-default" id="doc${currentDoc.docId}">Document: ${currentDoc.docName}</label>
+				<label for="docContent" class="label label-default" id="doc${currentDoc.docId}">Document: ${currentDoc.docName}</label>				
+			</div>
+		</section>
+		<section class="row">
+			<div class="col-sm-10 col-md-10">
+				<div class="form-group">					
 					<textarea  class="form-control" id="docContent" disabled>${currentDoc.docValue}</textarea>					
 				</div>
+			</div>
+			<div class="col-sm-2 col-md-2">
+				<div class="panel-group">
+					<div  class="panel panel-primary">
+				      <div id="userList" class="panel-heading">members</div>
+				    </div>
+				</div>				
 			</div>
 		</section>
 		</div>

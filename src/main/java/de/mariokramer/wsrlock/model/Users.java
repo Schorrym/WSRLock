@@ -17,7 +17,7 @@ public class Users {
 	private Long userId;
 	@Column(name="userName", unique=true)
 	private String userName;
-	@Column(name="sessionId")
+	@Column(name="sessionId", length=32)
 	private String sessionId;
 	
 	public Long getUserId() {

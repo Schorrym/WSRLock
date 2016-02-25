@@ -4720,13 +4720,16 @@ textarea.input-group-sm>.form-control, textarea.input-group-sm>.input-group-addo
 }
 
 .navbar-nav>li>a {
-	margin-left: 30px;
-	margin-right: 30px;
-	padding-left: 30px;
-	padding-right: 30px;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	line-height: 20px;
+	padding-top:10px;
+	padding-bottom:10px;
+	line-height:20px;
+	font-size: 20px;	
+}
+.navbar-nav>li>label {
+	padding-top:10px;
+	padding-bottom:10px;
+	line-height:20px;
+	font-size: 20px;	
 }
 
 @media ( max-width : 767px) {
@@ -4883,6 +4886,7 @@ textarea.input-group-sm>.form-control, textarea.input-group-sm>.input-group-addo
 .navbar-text {
 	margin-top: 15px;
 	margin-bottom: 15px;
+	font-size: 20px;
 }
 
 @media ( min-width : 768px) {

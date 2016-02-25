@@ -17,7 +17,7 @@ public class DocUsers {
 	@GeneratedValue
 	@Column(name="duId")
 	private Long duId;	
-	
+
 	@ManyToOne
 	@Target(value=Users.class)
 	private Users user;
@@ -30,6 +30,10 @@ public class DocUsers {
 	public DocUsers(Document doc, Users user) {
 		this.user = user;
 		this.doc = doc;
+	}
+	
+	public Long getDuId() {
+		return duId;
 	}
 	
 	public Users getUser() {

@@ -1,5 +1,6 @@
 <!-- This will show the Users name if available and the logout function -->
 <c:url value="/logout" var="logoutUrl" />
+<!-- This will redirect to springs security config "logout" url config see "WebSocketSecurityConfig.class" -->
 <form action="${logoutUrl}" method="post" id="logoutForm">
 	<!-- Spring Security Cross-Site-Request Schutz -->
 	<sec:csrfInput />

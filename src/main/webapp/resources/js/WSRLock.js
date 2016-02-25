@@ -21,42 +21,38 @@ var headers = {
 };
 headers[csrfHeader] = csrfToken;
 
+var pageName = $("#pageName").val();
+var currDocId = $("#docId").val();
+var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-	var pageName = $("#pageName").val();
-	var httpSession = $("#sessionId").val();
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
 	}else if(pageName == "readdoc"){
-		var currDocId = $("#docId").val();
 		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
 		conData.checkSub = sub('topic', 'checkDoc', handleCheckDoc);
-		var task = JSON.stringify({'task': currDocId});
-		conData.client.send("/app/checkDoc", {}, task);
+		var docId = JSON.stringify({'docId': currDocId});
+		conData.client.send("/app/checkDoc", {}, docId);
+		setInterval(function(){
+			conData.client.send("/app/broadcastUser", {}, docId);
+			}, 5000);
+	}else{
+		console.log("not allowed")
+		conData.client.disconnect();
 	}
 });
-
-//STOMP disconnect
-function disconnect(){
-	conData.client.disconnect(function(){
-		console.log('STOMP disconnected');
-	});
-};
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
 function editDoc(){
 	conData.docSub.unsubscribe();
-	conData.lockSub = sub('user', 'lockSuccess', handleLockSuccessIncome);
-	conData.saveSub = sub('user', 'saveSuccess', handleSaveSuccessIncome);
-	
-	var currDocId = $("#docId").val();
-	var editDoc = JSON.stringify({'task': currDocId});
+	conData.lockSub = sub('user', 'editMode', handleLockIncome);
+	var editDoc = JSON.stringify({'docId': currDocId});
 	conData.client.send("/app/editDoc", {}, editDoc);
 };
 
 function lockView(){
-	$("#editButton").attr("onclick", "");	
+	$("#editButton").attr("onclick", "");
 	$("#status").text("writing");
 	console.log('Document is now locked');
 };
@@ -68,21 +64,46 @@ function freeView(doc){
 	console.log('Document was unlocked');
 };
 
+//STOMP disconnect
+function disconnect(){
+	if(pageName == "readdoc"){
+		leaveDoc();
+	}	
+	conData.client.disconnect(function(){
+		console.log('STOMP disconnected');
+	});
+};
+
 //Server->Client -- Handles the message from the server after requesting editing the document
 function handleDocBroadcast(incoming) {
 	var payload = JSON.parse(incoming.body);
 	var object = payload.object;
 	var task = payload.task;
-	if(task == "lockView"){
+	console.log(task);
+	if(task == "writeMode"){
+		lockView();
+	}else if(task == "lockDoc"){
+		lockView();
+	}else if(task == "lockView"){
 		lockView();
 	}else if(task == "newDoc"){		
 		freeView(object);
 	}else if(task == "userUpdate"){
-		for (var i = 0; i < object.length; i++) {
-			console.log("BENUTZER: "+object[i].userName);			
-		}		
+		userUpdate(object);
 	}
 };
+
+//Add userName to the members list of specified doc
+function userUpdate(userList){
+	if(userList != null){
+		$(".panel-body").remove();
+		for (var i = 0; i < userList.length; i++) {
+			var div = $("<div/>");
+			div.addClass("panel-body text-right").html(userList[i].userName);
+			div.insertAfter("#userList");
+		}
+	}
+}
 
 //Client->Server -- When adding a new document on start.jsp page. New document is sent to the server
 function saveDoc(){
@@ -94,39 +115,80 @@ function saveDoc(){
 	conData.client.send("/app/saveDoc", {}, savedDoc);
 };
 
+//Server-Client -- Handles messages from the Server to the user who locked a document
+function handleLockIncome(incoming){
+	var payload = JSON.parse(incoming.body);
+	var object = payload.object;
+	var task = payload.task;
+	function autoSave(){
+		var autoValue = JSON.stringify({'docId': $("#docId").val(),
+										'docValue': $("#docContent").val()});
+		conData.client.send("/app/autoSave", {}, autoValue);
+	}
+	//Handles message from the Server when locking a document has succeeded (no broadcast, user unique)
+	if(task == "lockDoc"){
+		interval = setInterval( autoSave(), 20000 );		
+		console.log("locDoc: "+object);		
+		$("#docContent").prop("disabled", false);
+		$("#editButton").hide();
+		$("#exit").hide();
+		$("#save").show();
+		$("#status").text("writing");		
+		console.log('Document is locked for you: '+object);
+	//Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
+	}else if(task == "docSaved"){
+		conData.lockSub.unsubscribe();
+		$("#docContent").prop("disabled", true);
+		$("#editButton").show();
+		$("#exit").show();
+		$("#save").hide();
+		$("#status").text("reading");
+		var currDocId = $("#docId").val();
+		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
+		clearInterval(interval);
+		console.log('document was saved');
+	}else if(task == "userUpdate"){
+		userUpdate(object);
+	}
+};
+
 //Server->Client -- Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
-function handleSaveSuccessIncome(incoming){	
-	conData.lockSub.unsubscribe();
-	conData.saveSub.unsubscribe();
-	$("#docContent").prop("disabled", true);
-	$("#editButton").show();
-	$("#exit").show();
-	$("#save").hide();
-	$("#status").text("reading");
-	var currDocId = $("#docId").val();
-	conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast); 
-	console.log('document was saved');
-};
+//function handleSaveSuccessIncome(incoming){	
+//	
+//	//if saved
+//	conData.lockSub.unsubscribe();
+//	conData.saveSub.unsubscribe();
+//	$("#docContent").prop("disabled", true);
+//	$("#editButton").show();
+//	$("#exit").show();
+//	$("#save").hide();
+//	$("#status").text("reading");
+//	var currDocId = $("#docId").val();
+//	conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast); 
+//	console.log('document was saved');
+//	
+//	//if locked
+//	
+//};
 
-//Server-Client -- Handles message from the Server when locking a document has succeeded (no broadcast, user unique)
-function handleLockSuccessIncome(incoming){
-	var lockDoc = JSON.parse(incoming.body);
-	
-	$("#docContent").prop("disabled", false);
-	$("#editButton").hide();
-	$("#exit").hide();
-	$("#save").show();
-	$("#status").text("writing");	
-	
-	console.log('Document is locked for you: '+lockDoc.task);	
-};
 
-//When clicking the 'leav document' button on a specific document
+//function handleLockSuccessIncome(incoming){
+//	var lockDoc = JSON.parse(incoming.body);
+//	
+//	$("#docContent").prop("disabled", false);
+//	$("#editButton").hide();
+//	$("#exit").hide();
+//	$("#save").show();
+//	$("#status").text("writing");	
+//	
+//	console.log('Document is locked for you: '+lockDoc.task);	
+//};
+
+//When clicking the 'leave document' button on a specific document
 function leaveDoc(){
 	conData.docSub.unsubscribe();
 	var leave = JSON.stringify({'task': $("#docId").val()});
 	conData.client.send("/app/leaveDoc", {}, leave)
-	disconnect();
 };
 
 //When clicking 'show' on start page to show a specific document
@@ -219,10 +281,9 @@ function sub(type, url, callback){
 //Server-Client -- Check at the beginning of the document if it is locked in database
 function handleCheckDoc(incoming){
 	var message = JSON.parse(incoming.body);
-
 	if(message.task == "lockView"){
 		lockView();
 	}else if(message.task == "writeMode"){
-		//ToDo
+		editDoc();
 	}
 };

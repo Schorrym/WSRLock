@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import de.mariokramer.wsrlock.model.Document;
+import de.mariokramer.wsrlock.model.DocumentResourceLock;
 import de.mariokramer.wsrlock.model.Message;
 import de.mariokramer.wsrlock.model.Users;
 
@@ -31,12 +32,17 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	}
 	
 	@Override
+	public void broadcastUsersToLockUser(String userName, Message<List<Users>> users) {
+		messaging.convertAndSendToUser(userName, "/queue/editMode", users);		
+	}
+	
+	@Override
 	public void broadcastUsers(Long docId, Message<List<Users>> users) {
 		messaging.convertAndSend("/topic/doc"+docId, users);
 	}
 
 	@Override
-	public void lockDockument(Long docId, Message<Document> msg) {
+	public void lockDockument(Long docId, Message<DocumentResourceLock> msg) {
 		messaging.convertAndSend("/topic/doc"+docId, msg);
 	}
 
