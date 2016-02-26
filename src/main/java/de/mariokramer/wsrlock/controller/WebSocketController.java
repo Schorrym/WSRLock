@@ -50,6 +50,7 @@ public class WebSocketController{
 	@Autowired
 	private DocUsersDao docUserDao;
 	
+
 	@MessageMapping("/checkDoc")
 	@SendTo("/topic/checkDoc")
 	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, StompHeaderAccessor s){
@@ -66,7 +67,7 @@ public class WebSocketController{
 		userDao.save(user);
 		
 		//Check whether document-users combination already exists or not
-		doc = docDao.findOne(doc.getDocId());
+		doc = docDao.findOne(doc.getDocId());		
 		DocUsers du = null;
 		if(!docUserDao.existsByUser(user, doc)){
 			du = new DocUsers(docDao.findOne(doc.getDocId()), user);
@@ -75,24 +76,54 @@ public class WebSocketController{
 			du = docUserDao.findOneByUserAndDoc(user, doc);
 		}
 		
+		String task = checkResourceLock(p.getName(), doc.getDocId());
+		
 		//Check if document is already locked by a user
-		Message<DocumentResourceLock> drl = new Message<DocumentResourceLock>();
-		DocumentResourceLock rl = resLockDao.findOneByDocUsers(du);
-		if(rl != null){
-			drl.setTask("lockView");
-			if(rl.getDocUsers().getUser().getUserName().equals(p.getName())){
-				drl.setTask("writeMode");
-			}
-			drl.setObject(rl);
+		Message<DocumentResourceLock> messageDrl = new Message<DocumentResourceLock>();
+		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
+		if(task == null){
+			messageDrl.setTask("alright");
+			messageDrl.setObject(drl);
+		}else if(task.equals("writeMode")){
+			messageDrl.setTask(task);
+			messageDrl.setObject(drl);
+		}else if(task.equals("lockView")){
+			messageDrl.setTask("lockView");
+			messageDrl.setObject(drl);
+			log.error("This document is already locked, and can only be unlocked by the user who locked it");
 		}
-		return drl;
+		
+//		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
+//		if(drl != null){
+//			//If current document and current user can be found in locking table
+//			if(resLockDao.existsByDocUsers(du)){
+//				messageDrl.setTask("writeMode");
+//				messageDrl.setObject(drl);
+//				return messageDrl;
+//			}
+//			
+//			//If current document was locked by any other user
+//			for(DocumentResourceLock drls : resLockDao.findAll()){
+//				Long id = drls.getDocUsers().getDoc().getDocId();
+//				if(id == doc.getDocId()){
+//					log.error("This document is already locked, and can only be unlocked by the user who locked it");
+//					messageDrl.setTask("lockView");
+//					messageDrl.setObject(drl);
+//					return messageDrl;
+//				}
+//			}
+//		}
+		return messageDrl;
 	}
 	
 	@MessageMapping("/broadcastUser")
 	public void broadcastUser(Document doc, Principal p){
 		doc = docDao.findOne(doc.getDocId());
+		
 		List<DocUsers> dus = docUserDao.findAllByDoc(doc);
+		
 		LinkedList<Users> users = new LinkedList<Users>();
+		
 		for(DocUsers du : dus){
 			users.add(userDao.findOne(du.getUser().getUserId()));
 		}
@@ -109,11 +140,26 @@ public class WebSocketController{
 	public void autoSave(Document doc, Principal p){
 		String tempValue = doc.getDocValue();
 		doc = docDao.findOne(doc.getDocId());
+		
 		Users user = userDao.findOneByUserName(p.getName());
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
-		DocumentResourceLock rl = resLockDao.findOneByDocUsers(du);
-		rl.setTempDocValue(tempValue);
-		resLockDao.save(rl);
+		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
+		
+		if(!drl.getTempDocValue().equals(tempValue)){
+			drl.setTempDocValue(tempValue);
+			drl.setTimer(1);
+			
+		}else{
+			int timer = drl.getTimer();
+			++timer;
+			drl.setTimer(timer);
+			resLockDao.save(drl);
+			if(timer >= 5){
+				Message<Document> msg = new Message<Document>(doc, "timeOver");
+				docWebSocketService.timeOverMessage(p.getName(), msg);
+				resLockDao.delete(drl);
+			}			
+		}		
 	}
 	
 	@MessageMapping("/leaveDoc")
@@ -121,7 +167,9 @@ public class WebSocketController{
 		Document doc = docDao.findOne(Long.valueOf(msg.getTask()));
 		Users user = userDao.findOneByUserName(p.getName());
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
-		docUserDao.delete(du);
+		if(resLockDao.findOneByDocUsers(du) == null){
+			docUserDao.delete(du);
+		}			
 //		msg.setTask("userUpdate");
 //		docWebSocketService.broadcastUsers(doc.getDocId(), msg);
 	}
@@ -138,61 +186,99 @@ public class WebSocketController{
 		
 		return new Message<Document>(newDoc, "docSaved");
 	}
+	
+	public String checkResourceLock(String userName, Long docId){
+		Users user = userDao.findOneByUserName(userName);
+		Document doc = docDao.findOne(docId);
+		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
+		List<DocumentResourceLock> drls = resLockDao.findAll();
 		
+		if(drls != null){
+			
+			if(resLockDao.existsByDocUsers(du)){
+//				messageDrl.setTask("writeMode");
+//				messageDrl.setObject(drl);
+				return "writeMode";
+			}
+			//If current document was locked by any other user
+			for(DocumentResourceLock drl : drls){
+				Long id = drl.getDocUsers().getDoc().getDocId();
+				if(id == doc.getDocId()){
+					
+//					messageDrl.setTask("lockView");
+//					messageDrl.setObject(drl);
+					return "lockView";
+				}
+			}
+		}		
+		return null;
+	}
+	
 	@MessageMapping("/editDoc")
 	@SendToUser("/queue/editMode")
 	public Message<DocumentResourceLock> editDoc(Document doc, Principal p, SimpMessageHeaderAccessor header){
-		doc = docDao.findOne(doc.getDocId());
-		Users user = userDao.findOneByUserName(p.getName());
+		doc = docDao.findOne(doc.getDocId());		
+		Users user = userDao.findOneByUserName(p.getName());		
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
 		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
 		Message<DocumentResourceLock> messageDrl = new Message<>();
 		
-		//If current document and current user can be found in locking table
-		if(resLockDao.existsByDocUsers(du)){
-			messageDrl.setTask("writeMode");
+		String task = checkResourceLock(p.getName(), doc.getDocId());
+		
+		if(task == null){
+			//If no locking entry is found for that document, editing the document can be allowed
+			drl = new DocumentResourceLock();
+			drl.setTimer(1);
+			synchronized (doc) {
+				drl.setTempDocValue(doc.getDocValue());
+				drl.setDocUsers(du);
+				messageDrl.setTask("lockDoc");
+				messageDrl.setObject(drl);
+				docWebSocketService.lockDockument(doc.getDocId(), messageDrl);
+			}
+			resLockDao.save(drl);
+		}else if(task.equals("writeMode")){
+			//If current document AND current user can be found in locking table
+			messageDrl.setTask(task);
 			messageDrl.setObject(drl);
-			return messageDrl;
+		}else if(task.equals("lockView")){
+			//If current document was locked by any other user
+			messageDrl.setTask(task);
+			messageDrl.setObject(drl);
+			log.error("This document is already locked, and can only be unlocked by the user who locked it");
 		}
 		
-		//If current document was locked by any other user
-		for(DocumentResourceLock drls : resLockDao.findAll()){
-			Long id = drls.getDocUsers().getDoc().getDocId();
-			if(id == doc.getDocId()){
-				log.error("This document is already locked, and can only be unlocked by the user who locked it");
-				messageDrl.setTask("lockView");
-				messageDrl.setObject(drl);
-				return messageDrl;
-			}
-		}			
-
-		//If no locking entry is found, editing the document can be allowed
-		synchronized (doc) {
-			drl.setTempDocValue(doc.getDocValue());
-			messageDrl.setTask("lockDoc");
-			messageDrl.setObject(drl);
-			docWebSocketService.lockDockument(doc.getDocId(), messageDrl);
-		}
-		resLockDao.save(drl);
-		return messageDrl;
-//		doc.setObject(docDao.findOne(Long.valueOf(doc.getTask())));
-//		Users user = userDao.findOneByUserName(p.getName());
-//		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc.getObject());
-//		DocumentResourceLock docLock = null;
-//		if(resLockDao.existsByDocUsers(du)){
-//			log.error("Requested source is already in locking table. Check the resource lock table for that document and delete it");
-//		}else{			
-//			log.info("Document: " + doc.getObject().getDocName() + " is now locked for user: " + p.getName());
-//			doc.setTask("lockView");
-//			synchronized (doc) {				
-//				docLock = new DocumentResourceLock(du);
-//				docLock.setTempDocValue(doc.getObject().getDocValue());
-//				docWebSocketService.lockDockument(doc.getObject().getDocId(), doc);
+//		if(drl != null){
+//			//If current document and current user can be found in locking table
+//			if(resLockDao.existsByDocUsers(du)){
+//				messageDrl.setTask("writeMode");
+//				messageDrl.setObject(drl);
+//				return messageDrl;
 //			}
-//			resLockDao.save(docLock);
+//			//If current document was locked by any other user
+//			for(DocumentResourceLock drls : resLockDao.findAll()){
+//				Long id = drls.getDocUsers().getDoc().getDocId();
+//				if(id == doc.getDocId()){
+//					log.error("This document is already locked, and can only be unlocked by the user who locked it");
+//					messageDrl.setTask("lockView");
+//					messageDrl.setObject(drl);
+//					return messageDrl;
+//				}
+//			}
+//		}else{
+//			//If no locking entry is found, editing the document can be allowed
+//			drl = new DocumentResourceLock();
+//			drl.setTimer(1);
+//			synchronized (doc) {
+//				drl.setTempDocValue(doc.getDocValue());
+//				drl.setDocUsers(du);
+//				messageDrl.setTask("lockDoc");
+//				messageDrl.setObject(drl);
+//				docWebSocketService.lockDockument(doc.getDocId(), messageDrl);
+//			}
+//			resLockDao.save(drl);
 //		}
-//		Message<DocumentResourceLock> msg = new Message<DocumentResourceLock>(docLock, "lockDoc");
-//		return msg;
+		return messageDrl;
 	}
 	
 	@MessageMapping("/delDoc")
@@ -215,7 +301,7 @@ public class WebSocketController{
 		log.info("New Document added to database through WebSockets");
 		docWebSocketService.broadcastDocument(doc);
 	}
-
+	
 	@EventListener
 	public void startupHandler(BrokerAvailabilityEvent event){
 		//Delete all Document-User realtion at the startup of the Application

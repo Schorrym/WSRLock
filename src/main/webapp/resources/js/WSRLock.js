@@ -134,7 +134,7 @@ function handleLockIncome(incoming){
 		if(task == "writeMode"){
 			$("#docContent").val(object['tempDocValue']);
 		}
-		conData.interval = setInterval( autoSave, 20000 );		
+		conData.interval = setInterval( autoSave, 5000 );		
 		$("#docContent").prop("disabled", false);
 		$("#editButton").hide();
 		$("#exit").hide();
@@ -142,7 +142,7 @@ function handleLockIncome(incoming){
 		$("#status").text("writing");
 		console.log('Document is locked for you: '+object['docUsers']['user']['userName']);
 	//Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
-	}else if(task == "docSaved"){
+	}else if(task == "docSaved" || task == "timeOver"){
 		conData.lockSub.unsubscribe();
 		$("#docContent").prop("disabled", true);
 		$("#editButton").show();

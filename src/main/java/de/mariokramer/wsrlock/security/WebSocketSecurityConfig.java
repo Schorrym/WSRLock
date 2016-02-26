@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.socket.AbstractSecurit
 
 @Configuration
 public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
-
+	
 	@Override
 	protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
 		messages.nullDestMatcher().authenticated()

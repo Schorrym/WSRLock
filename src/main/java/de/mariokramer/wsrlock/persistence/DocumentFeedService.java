@@ -15,6 +15,7 @@ public interface DocumentFeedService {
 	//Broadcasts on read page
 	public void broadcastUsers(Long docId, Message<List<Users>> users);
 	public void broadcastUsersToLockUser(String userName, Message<List<Users>> users);
+	public void timeOverMessage(String userName, Message<Document> doc);
 	public void lockDockument(Long docId, Message<DocumentResourceLock> msg);
 	public void saveDocument(Long docId, Message<Document> newDoc);
 }

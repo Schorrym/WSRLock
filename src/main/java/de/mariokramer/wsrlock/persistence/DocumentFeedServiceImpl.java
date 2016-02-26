@@ -33,7 +33,7 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	
 	@Override
 	public void broadcastUsersToLockUser(String userName, Message<List<Users>> users) {
-		messaging.convertAndSendToUser(userName, "/queue/editMode", users);		
+		messaging.convertAndSendToUser(userName, "/queue/editMode", users);
 	}
 	
 	@Override
@@ -49,5 +49,10 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	@Override
 	public void saveDocument(Long docId, Message<Document> newDoc) {
 		messaging.convertAndSend("/topic/doc"+docId, newDoc);		
+	}
+
+	@Override
+	public void timeOverMessage(String userName, Message<Document> doc) {
+		messaging.convertAndSendToUser(userName, "/queue/editMode", doc);		
 	}
 }

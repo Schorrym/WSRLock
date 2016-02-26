@@ -28,7 +28,10 @@ public class DocumentResourceLock {
 	
 	@Column(name="tempDocValue", columnDefinition = "text")
 	private String tempDocValue;
-		
+	
+	@Column(name="timer")
+	private int timer;
+	
 	@Column(name="dateCreated", updatable=false, insertable=false)
 	private Date dateCreated;
 	
@@ -49,7 +52,7 @@ public class DocumentResourceLock {
 	 */
 	public DocumentResourceLock() {}
 	public DocumentResourceLock(DocUsers docUsers) {
-		this.setDocUsers(docUsers);
+		this.setDocUsers(docUsers);	
 	}
 	
 	public DocUsers getDocUsers() {
@@ -77,6 +80,14 @@ public class DocumentResourceLock {
 		return tempDocValue;
 	}
 	
+	public int getTimer() {
+		return timer;
+	}
+
+	public void setTimer(int timer) {
+		this.timer = timer;
+	}
+
 	public void setTempDocValue(String tempDoc) {
 		this.tempDocValue = tempDoc;
 	}
