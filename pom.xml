@@ -228,16 +228,6 @@
 			<artifactId>spring-data-commons</artifactId>
 			<version>1.11.2.RELEASE</version>
 		</dependency>
-		<dependency>
-		    <groupId>org.quartz-scheduler</groupId>
-		    <artifactId>quartz</artifactId>
-		    <version>2.2.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.quartz-scheduler</groupId>
-		    <artifactId>quartz-jobs</artifactId>
-		    <version>2.2.2</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
