@@ -3,6 +3,7 @@ package de.mariokramer.wsrlock.controller;
 import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -301,6 +303,7 @@ public class WebSocketController{
 	
 	@MessageMapping("/addDoc")
 	public void addDocument(Document doc) {
+		
 		doc = docDao.save(doc);
 		if(doc.getDocValue().length() > 64){
 			doc.setDocValue(doc.getDocValue().substring(0,32) + "...");
