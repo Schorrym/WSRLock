@@ -24,7 +24,9 @@ public class WebSocketHandshakeInterceptor extends DefaultHandshakeHandler imple
 		
 		if(request.getHeaders().getOrigin().equals("http://localhost:8080")){
 			return true;
-		}		
+		}
+		System.out.println(request.getHeaders().getFirst("Sec-WebSocket-Protocol"));
+		
 		return false;
 	}
 

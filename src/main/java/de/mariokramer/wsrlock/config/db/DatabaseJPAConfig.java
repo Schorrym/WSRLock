@@ -1,5 +1,6 @@
 package de.mariokramer.wsrlock.config.db;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 

@@ -4,6 +4,9 @@ import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.support.RequestHandledEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import de.mariokramer.wsrlock.model.DocUsers;
 import de.mariokramer.wsrlock.model.Document;
@@ -180,7 +185,9 @@ public class WebSocketController{
 		Document newDoc = docDao.findOne(doc.getDocId());
 		Users user = userDao.getUsersByUserName(p.getName());
 		newDoc.setDocValue(doc.getDocValue());
-		docDao.save(newDoc);
+		synchronized (newDoc) {
+			docDao.save(newDoc);	
+		}
 		docWebSocketService.saveDocument(newDoc.getDocId(), new Message<Document>(newDoc, "newDoc"));
 		resLockDao.deleteByDocUsers(docUserDao.findOneByUserAndDoc(user, newDoc));
 		
@@ -300,6 +307,11 @@ public class WebSocketController{
 		}
 		log.info("New Document added to database through WebSockets");
 		docWebSocketService.broadcastDocument(doc);
+	}
+	
+	@EventListener
+	public void startupHandlersss(SessionSubscribeEvent event){
+		System.out.println("Subscribb: "+event.toString());
 	}
 	
 	@EventListener
