@@ -26,6 +26,7 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
+	conData.hashCode = sub('app', 'tokenCheck', handleToken);
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
@@ -42,6 +43,14 @@ conData.client.connect(headers, function(frame){
 		conData.client.disconnect();
 	}
 });
+
+function handleToken(incoming){
+	var payload = JSON.parse(incoming.body);
+	var object = payload.object;
+	var hashCode = payload.hash;
+	console.log(hashCode);
+	
+}
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
 function editDoc(){

@@ -11,12 +11,14 @@ import javax.persistence.LockModeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -58,20 +60,42 @@ public class WebSocketController{
 	private DocUsersDao docUserDao;
 	
 
-	@MessageMapping("/checkDoc")
-	@SendTo("/topic/checkDoc")
-	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, StompHeaderAccessor s){
-		//Check whether user already exists or not
+	@SubscribeMapping("/tokenCheck")
+	public Message createToken(Principal p, SimpMessageHeaderAccessor s){
+		String userName = p.getName();
+		String sessionId = s.getSessionId();
+		String hashCode = String.valueOf((userName+sessionId).hashCode());
+		
 		Users user = null;
-		if(userDao.existsByUserName(p.getName())){
-			user = userDao.findOneByUserName(p.getName());
-			user.setSessionId(s.getSessionId());
+		if(userDao.existsByUserName(userName)){
+			user = userDao.findOneByUserName(userName);
+			user.setSessionId(String.valueOf(hashCode));
 		}else{
 			user = new Users();
-			user.setUserName(p.getName());
-			user.setSessionId(s.getSessionId());
+			user.setUserName(userName);
+			user.setSessionId(String.valueOf(hashCode));
 		}
 		userDao.save(user);
+		Message msg = new Message<>();
+		msg.setHash(hashCode);
+		
+		return new Message();
+	}
+	
+	@MessageMapping("/checkDoc")
+	@SendTo("/topic/checkDoc")
+	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, SimpMessageHeaderAccessor s){
+		//Check whether user already exists or not
+		Users user = null;
+//		if(userDao.existsByUserName(p.getName())){
+			user = userDao.findOneByUserName(p.getName());
+//			user.setSessionId(s.getSessionId());
+//		}else{
+//			user = new Users();
+//			user.setUserName(p.getName());
+//			user.setSessionId(s.getSessionId());
+//		}
+//		userDao.save(user);
 		
 		//Check whether document-users combination already exists or not
 		doc = docDao.findOne(doc.getDocId());		
@@ -310,11 +334,6 @@ public class WebSocketController{
 		}
 		log.info("New Document added to database through WebSockets");
 		docWebSocketService.broadcastDocument(doc);
-	}
-	
-	@EventListener
-	public void startupHandlersss(SessionSubscribeEvent event){
-		System.out.println("Subscribb: "+event.toString());
 	}
 	
 	@EventListener
