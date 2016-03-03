@@ -37,5 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.formLogin().loginPage("/login").permitAll()
 							.failureUrl("/login?error")
 							.defaultSuccessUrl("/start");
+//			.and()
+//				.portMapper().http(8080).mapsTo(8443);
 	}
 }

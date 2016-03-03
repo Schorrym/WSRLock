@@ -61,7 +61,7 @@ public class WebSocketController{
 	
 
 	@SubscribeMapping("/tokenCheck")
-	public Message createToken(Principal p, SimpMessageHeaderAccessor s){
+	public Message<Document> createToken(Principal p, SimpMessageHeaderAccessor s){
 		String userName = p.getName();
 		String sessionId = s.getSessionId();
 		String hashCode = String.valueOf((userName+sessionId).hashCode());
@@ -76,7 +76,7 @@ public class WebSocketController{
 			user.setSessionId(String.valueOf(hashCode));
 		}
 		userDao.save(user);
-		Message msg = new Message<>();
+		Message<Document> msg = new Message<Document>();
 		msg.setHash(hashCode);
 		
 		return new Message();

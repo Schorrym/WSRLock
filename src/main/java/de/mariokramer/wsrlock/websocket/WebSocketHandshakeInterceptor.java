@@ -33,20 +33,20 @@ public class WebSocketHandshakeInterceptor extends DefaultHandshakeHandler imple
 	@Override
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 			Map<String, Object> attributes) throws Exception {
-							
+		
 		String origin = request.getHeaders().getOrigin();
 		if(origin.equals("http://localhost:8080")){
 			return true;
 		}
-		return false;		
+		return true;		
 	}
 
 	@Override
 	public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 			Exception exception) {
-		if(request instanceof ServletServerHttpRequest){
-			response.getHeaders().add("proof", String.valueOf(setUserSession(request)));
-		}
+//		if(request instanceof ServletServerHttpRequest){
+//			response.getHeaders().add("proof", String.valueOf(setUserSession(request)));
+//		}
 	}
 
 	/**
