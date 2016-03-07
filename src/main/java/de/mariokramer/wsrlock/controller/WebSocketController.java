@@ -3,28 +3,19 @@ package de.mariokramer.wsrlock.controller;
 import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.context.support.RequestHandledEvent;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import de.mariokramer.wsrlock.model.DocUsers;
 import de.mariokramer.wsrlock.model.Document;
@@ -79,7 +70,7 @@ public class WebSocketController{
 		Message<Document> msg = new Message<Document>();
 		msg.setHash(hashCode);
 		
-		return new Message();
+		return msg;
 	}
 	
 	@MessageMapping("/checkDoc")

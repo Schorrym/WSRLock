@@ -1,11 +1,6 @@
 package de.mariokramer.wsrlock.controller;
 
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +18,6 @@ import de.mariokramer.wsrlock.persistence.DocumentDao;
  */
 @RestController
 public class MainController {
-	
-	private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
 	@Autowired
 	private DocumentDao docDao;
@@ -49,6 +42,7 @@ public class MainController {
 	@RequestMapping(value = "/readDoc", method = RequestMethod.GET)
 	public ModelAndView redirectReadDoc(ModelAndView model,
 			@RequestParam(value="docId", required=true) Long docId) {
+
 		model.addObject("currentDoc", docDao.findOne(docId));
 		model.setViewName("readdoc");
 		return model;

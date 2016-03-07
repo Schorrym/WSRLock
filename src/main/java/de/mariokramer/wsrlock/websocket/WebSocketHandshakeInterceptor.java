@@ -1,26 +1,12 @@
 package de.mariokramer.wsrlock.websocket;
 
-import java.security.Principal;
 import java.util.Map;
 
-import javax.websocket.Session;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-
-import de.mariokramer.wsrlock.model.Users;
-import de.mariokramer.wsrlock.persistence.UserDao;
 
 public class WebSocketHandshakeInterceptor extends DefaultHandshakeHandler implements HandshakeInterceptor{
 	
