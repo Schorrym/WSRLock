@@ -1,4 +1,4 @@
-package de.mariokramer.wsrlock.security;
+package de.mariokramer.wsrlock.config.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;

@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import de.mariokramer.wsrlock.security.WebSecurityConfig;
+import de.mariokramer.wsrlock.config.security.WebSecurityConfig;
 
 
 @Configuration

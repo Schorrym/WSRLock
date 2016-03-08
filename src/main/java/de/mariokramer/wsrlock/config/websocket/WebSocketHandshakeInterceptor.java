@@ -1,4 +1,4 @@
-package de.mariokramer.wsrlock.websocket;
+package de.mariokramer.wsrlock.config.websocket;
 
 import java.util.Map;
 

@@ -26,7 +26,9 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-	conData.hashCode = sub('app', 'tokenCheck', handleToken);
+	setInterval(function(){
+		conData.hashCode = sub('app', 'tokenCheck', handleToken);
+		}, 20000);
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
@@ -39,7 +41,6 @@ conData.client.connect(headers, function(frame){
 			conData.client.send("/app/broadcastUser", {}, docId);
 			}, 5000);
 	}else{
-		console.log("not allowed")
 		conData.client.disconnect();
 	}
 });
@@ -48,8 +49,6 @@ function handleToken(incoming){
 	var payload = JSON.parse(incoming.body);
 	var object = payload.object;
 	var hashCode = payload.hash;
-	console.log(hashCode);
-	
 }
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
@@ -60,17 +59,29 @@ function editDoc(){
 	conData.client.send("/app/editDoc", {}, editDoc);
 };
 
+//This is for locking the view when someone else are editing the document
 function lockView(){
 	$("#editButton").attr("onclick", "");
 	$("#status").text("writing");
 	console.log('Document is now locked');
 };
 
+//Dialog pops up before content gets refreshed after saving new document
+function contentRefreshDialog(doc){
+	if (confirm('Do you want to refresh the content?')) {
+		$("#docContent").val(doc.docValue);
+	} else {
+	    alert('Document value has changed. Be carefull with the current data!');
+	}
+};
+
+//Gives the view free again after a document was successfully saved by another editor
 function freeView(doc){
 	$("#editButton").attr("onclick", "editDoc()");	
 	$("#status").text("reading");
-	$("#docContent").val(doc.docValue);
-	console.log('Document was unlocked');
+	
+	contentRefreshDialog(doc);
+//	$("#docContent").val(doc.docValue);
 };
 
 //STOMP disconnect

@@ -1,4 +1,4 @@
-package de.mariokramer.wsrlock.websocket;
+package de.mariokramer.wsrlock.config.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

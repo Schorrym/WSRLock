@@ -1,4 +1,4 @@
-package de.mariokramer.wsrlock.security;
+package de.mariokramer.wsrlock.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

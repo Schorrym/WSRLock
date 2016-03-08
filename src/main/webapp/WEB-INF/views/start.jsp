@@ -1,4 +1,5 @@
-<%@include file="1_Top.jsp"%>
+<%@include file="1_Top.jsp" %>
+<!DOCTYPE html>
 <html>
 <head>
 <%@include file="2_Head.jsp"%>
@@ -29,7 +30,8 @@
 									<td>${doc.docName}</td>
 									<td>${doc.docValue}</td>
 									<td>
-										<a onclick="showDoc()" href="<c:url value="/readDoc?docId=${doc.docId}"/>" type="button" class="btn btn-primary" id="showDoc">Show</a>
+										<c:url value="/readDoc?docId=${doc.docId}" var="showUrl" />
+										<a onclick="showDoc()" href="${showUrl}" type="button" class="btn btn-primary" id="showDoc">Show</a>
 										<a onclick="delDoc(${doc.docId})" type="button" class="btn btn-danger" id="delDocId${doc.docId}">x</a>
 									</td>
 								</tr>
