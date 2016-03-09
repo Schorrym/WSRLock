@@ -13,7 +13,9 @@ public class WebSocketStompConfig extends AbstractWebSocketMessageBrokerConfigur
 	
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/readDocument").withSockJS().setInterceptors(getInterceptor());
+		registry.addEndpoint("/readDocument").withSockJS()
+			.setClientLibraryUrl("http://localhost:8080/wsrlock/resources/js/sockjs-1.0.3.min.js")
+			.setInterceptors(getInterceptor());
 	}	
 	
 	private HandshakeInterceptor getInterceptor() {
