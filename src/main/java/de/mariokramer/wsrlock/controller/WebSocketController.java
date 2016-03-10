@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.OptimisticLockException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,16 +172,20 @@ public class WebSocketController{
 		Document newDoc = docDao.findOne(doc.getDocId());
 		Users user = userDao.getUsersByUserName(p.getName());
 		newDoc.setDocValue(doc.getDocValue());
-		synchronized (newDoc) {
+		try{
 			docDao.save(newDoc);
+		}catch(OptimisticLockException e){
+			log.error("Could not save new Document due to double saving Error: "+e.getMessage());
 		}
+		
 		docWebSocketService.saveDocument(newDoc.getDocId(), new Message<Document>(newDoc, "newDoc"));
 		resLockDao.deleteByDocUsers(docUserDao.findOneByUserAndDoc(user, newDoc));
 		
 		return new Message<Document>(newDoc, "docSaved");
 	}
 	
-	public String checkResourceLock(String userName, Long docId){
+	//Only allow one user at a time to check if the resource is free or already in use
+	public synchronized String checkResourceLock(String userName, Long docId){
 		Users user = userDao.findOneByUserName(userName);
 		Document doc = docDao.findOne(docId);
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
@@ -209,11 +215,8 @@ public class WebSocketController{
 		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
 		Message<DocumentResourceLock> messageDrl = new Message<>();
 		String task = null;
-		
-		//Only allow one user at a time to check if the resource is free or already in use
-		synchronized (task) {
-			task = checkResourceLock(p.getName(), doc.getDocId());
-		}		
+
+		task = checkResourceLock(p.getName(), doc.getDocId());
 		
 		if(task == null){
 			//If no locking entry is found for that document, editing the document can be allowed
@@ -243,7 +246,7 @@ public class WebSocketController{
 	@MessageMapping("/delDoc")
 	public void deleteDocument(Document doc){
 		if(docDao.findOne(doc.getDocId()) != null) {
-			docDao.delete(doc);
+			docDao.delete(doc.getDocId());
 			docWebSocketService.deleteDocument(doc.getDocId());
 			log.info("Document with ID-"+doc.getDocId()+" was deleted");
 		}else{

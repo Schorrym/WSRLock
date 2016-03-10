@@ -9,20 +9,23 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 public class WebSocketHandshakeInterceptor extends DefaultHandshakeHandler implements HandshakeInterceptor{
-	
+
 	@Override
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 			Map<String, Object> attributes) throws Exception {
-		
 		String origin = request.getHeaders().getOrigin();
-		if(origin.equals("http://localhost:8080")){
+		if(origin != null && origin.equals("http://localhost:8080")){
 			return true;
 		}
-		return true;		
+		return true;
 	}
 
 	@Override
 	public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 			Exception exception) {
+		// TODO Auto-generated method stub
+		
 	}
+	
+	
 }

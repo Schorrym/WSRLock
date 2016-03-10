@@ -12,5 +12,5 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 				excludeFilters= {@Filter(type=FilterType.ANNOTATION, value=EnableWebMvc.class)})
 
 public class SecurityRootConfig extends AbstractSecurityWebApplicationInitializer {
-
+	
 }
