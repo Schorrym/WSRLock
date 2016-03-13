@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="resourcelock")
@@ -32,10 +34,12 @@ public class DocumentResourceLock {
 	@Column(name="timer")
 	private int timer;
 	
-	@Column(name="dateCreated", updatable=false, insertable=false)
+	@Column(name="dateCreated", nullable=false)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateCreated;
 	
-	@Column(name="lastModified", updatable=false, insertable=false)
+	@Column(name="lastModified", nullable=false)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastModified;
 
 	@PreUpdate

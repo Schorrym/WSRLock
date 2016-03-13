@@ -142,7 +142,7 @@ public class WebSocketController{
 		if(!drl.getTempDocValue().equals(tempValue)){
 			drl.setTempDocValue(tempValue);
 			drl.setTimer(1);
-			
+			resLockDao.save(drl);
 		}else{
 			int timer = drl.getTimer();
 			++timer;
@@ -169,11 +169,15 @@ public class WebSocketController{
 	@MessageMapping("/saveDoc")
 	@SendToUser("/queue/editMode")
 	public Message<Document> saveDoc(Document doc, Principal p){
+		Long docVersion = doc.getDocVersion();
 		Document newDoc = docDao.findOne(doc.getDocId());
 		Users user = userDao.getUsersByUserName(p.getName());
 		newDoc.setDocValue(doc.getDocValue());
 		try{
-			docDao.save(newDoc);
+			DocUsers du = new DocUsers(newDoc, user);
+			if(du != null && du.getDoc().getDocVersion() == docVersion){
+				docDao.save(newDoc);
+			}			
 		}catch(OptimisticLockException e){
 			log.error("Could not save new Document due to double saving Error: "+e.getMessage());
 		}
@@ -222,7 +226,7 @@ public class WebSocketController{
 			//If no locking entry is found for that document, editing the document can be allowed
 			drl = new DocumentResourceLock();
 			drl.setTimer(1);
-			
+
 			drl.setTempDocValue(doc.getDocValue());
 			drl.setDocUsers(du);
 			messageDrl.setTask("lockDoc");

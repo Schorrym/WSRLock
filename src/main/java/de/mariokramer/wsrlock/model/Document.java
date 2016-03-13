@@ -24,8 +24,16 @@ public class Document {
 	
 	@Version
 	@Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-	private Long version;
+	private Long docVersion;
 	
+	public Long getDocVersion() {
+		return docVersion;
+	}
+
+	public void setDocVersion(Long docVersion) {
+		this.docVersion = docVersion;
+	}
+
 	public Document(String docName) {
 		this.setDocName(docName);
 	}

@@ -81,7 +81,6 @@ function freeView(doc){
 	$("#status").text("reading");
 	
 	contentRefreshDialog(doc);
-//	$("#docContent").val(doc.docValue);
 };
 
 //STOMP disconnect
@@ -127,10 +126,13 @@ function userUpdate(userList){
 
 //Client->Server -- When adding a new document on start.jsp page. New document is sent to the server
 function saveDoc(){
+	var docVersion = window.localStorage.getItem("docVersion");
+	window.localStorage.removeItem("docVersion");
 	var docId = $("#docId").val();
 	var docValue = $("#docContent").val();
 	var savedDoc = JSON.stringify({'docId': docId,
-		  						   'docValue': docValue
+		  						   'docValue': docValue,
+		  						   'docVersion': docVersion,
 		  			});
 	conData.client.send("/app/saveDoc", {}, savedDoc);
 };
@@ -150,7 +152,11 @@ function handleLockIncome(incoming){
 	var task = payload.task;
 	
 	//Handles message from the Server when locking a document has succeeded (no broadcast, user unique)
+	//lockDoc = document locked after requesting (click edit)
+	//writeMode = document reentered after system crash for example
 	if(task == "lockDoc" || task == "writeMode"){
+		var docVersion = object['docUsers']['doc']['docVersion'];
+		window.localStorage.setItem("docVersion", docVersion);
 		if(task == "writeMode"){
 			$("#docContent").val(object['tempDocValue']);
 		}
