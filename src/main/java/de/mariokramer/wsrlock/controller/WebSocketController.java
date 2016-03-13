@@ -61,11 +61,11 @@ public class WebSocketController{
 		Users user = null;
 		if(userDao.existsByUserName(userName)){
 			user = userDao.findOneByUserName(userName);
-			user.setSessionId(String.valueOf(hashCode));
+			user.setUserHash(p.hashCode());
 		}else{
 			user = new Users();
 			user.setUserName(userName);
-			user.setSessionId(String.valueOf(hashCode));
+			user.setUserHash(p.hashCode());
 		}
 		userDao.save(user);
 		Message<Document> msg = new Message<Document>();
@@ -77,6 +77,7 @@ public class WebSocketController{
 	@MessageMapping("/checkDoc")
 	@SendTo("/topic/checkDoc")
 	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, SimpMessageHeaderAccessor s){
+		
 		Users user = null;
 		user = userDao.findOneByUserName(p.getName());
 		
@@ -189,7 +190,7 @@ public class WebSocketController{
 	}
 	
 	//Only allow one user at a time to check if the resource is free or already in use
-	public synchronized String checkResourceLock(String userName, Long docId){
+	public String checkResourceLock(String userName, Long docId){
 		Users user = userDao.findOneByUserName(userName);
 		Document doc = docDao.findOne(docId);
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
@@ -218,22 +219,20 @@ public class WebSocketController{
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
 		DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
 		Message<DocumentResourceLock> messageDrl = new Message<>();
-		String task = null;
-
-		task = checkResourceLock(p.getName(), doc.getDocId());
+		String task = checkResourceLock(p.getName(), doc.getDocId());
 		
 		if(task == null){
 			//If no locking entry is found for that document, editing the document can be allowed
-			drl = new DocumentResourceLock();
-			drl.setTimer(1);
-
-			drl.setTempDocValue(doc.getDocValue());
-			drl.setDocUsers(du);
-			messageDrl.setTask("lockDoc");
-			messageDrl.setObject(drl);
-			docWebSocketService.lockDockument(doc.getDocId(), messageDrl);
-			
-			resLockDao.save(drl);
+			synchronized (this) {
+				drl = new DocumentResourceLock();
+				drl.setTimer(1);
+				drl.setTempDocValue(doc.getDocValue());
+				drl.setDocUsers(du);
+				messageDrl.setTask("lockDoc");
+				messageDrl.setObject(drl);
+				resLockDao.save(drl);
+			}
+			docWebSocketService.lockDockument(doc.getDocId(), messageDrl);			
 		}else if(task.equals("writeMode")){
 			//If current document AND current user can be found in locking table
 			messageDrl.setTask(task);

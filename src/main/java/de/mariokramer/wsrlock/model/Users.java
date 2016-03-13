@@ -15,10 +15,38 @@ public class Users {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="userId")
 	private Long userId;
-	@Column(name="userName", unique=true)
+	
+	@Column(name="userName", unique=true, nullable=false)
 	private String userName;
-	@Column(name="sessionId", length=32)
-	private String sessionId;
+	
+	@Column(name="userPass", nullable=false)
+	private String userPass;
+	
+	@Column(name="userHash", length=32)
+	private int userHash;
+	
+	@Column(name="enabled")
+	private int enabled;
+	
+	public String getUserPass() {
+		return userPass;
+	}
+	public void setUserPass(String userPass) {
+		this.userPass = userPass;
+	}
+	public int getEnabled() {
+		return enabled;
+	}
+	public void setEnabled(int enabled) {
+		this.enabled = enabled;
+	}
+	public Users() {}
+	public Users(Users users){
+		this.userName = users.userName;
+		this.userPass = users.userPass;
+		this.userHash = users.userHash;
+		this.enabled = users.enabled;
+	}
 	
 	public Long getUserId() {
 		return userId;
@@ -32,10 +60,10 @@ public class Users {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public String getSessionId() {
-		return sessionId;
+	public int getUserHash() {
+		return userHash;
 	}
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+	public void setUserHash(int userHash) {
+		this.userHash = userHash;
 	}
 }
