@@ -53,30 +53,22 @@ public class WebSocketController{
 	private DocUsersDao docUserDao;	
 
 	@SubscribeMapping("/tokenCheck")
-	public Message<Document> createToken(Principal p, SimpMessageHeaderAccessor s){
+	public Message<Document> createToken(Principal p){
 		String userName = p.getName();
-		String sessionId = s.getSessionId();
-		String hashCode = String.valueOf((userName+sessionId).hashCode());
 		
-		Users user = null;
-		if(userDao.existsByUserName(userName)){
-			user = userDao.findOneByUserName(userName);
-			user.setUserHash(p.hashCode());
-		}else{
-			user = new Users();
-			user.setUserName(userName);
-			user.setUserHash(p.hashCode());
-		}
+		
+		Users user = userDao.findOneByUserName(userName);
+		user.setUserHash(p.hashCode());		
 		userDao.save(user);
 		Message<Document> msg = new Message<Document>();
-		msg.setHash(hashCode);
+		msg.setHash("bla");
 		
 		return msg;
 	}
 	
 	@MessageMapping("/checkDoc")
 	@SendTo("/topic/checkDoc")
-	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, SimpMessageHeaderAccessor s){
+	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p){
 		
 		Users user = null;
 		user = userDao.findOneByUserName(p.getName());
@@ -84,7 +76,7 @@ public class WebSocketController{
 		//Check whether document-users combination already exists or not
 		doc = docDao.findOne(doc.getDocId());		
 		DocUsers du = null;
-		if(!docUserDao.existsByUser(user, doc)){
+		if(!docUserDao.existsByUser(user, doc) && user != null){
 			du = new DocUsers(docDao.findOne(doc.getDocId()), user);
 			docUserDao.save(du);
 		}else{
@@ -107,7 +99,6 @@ public class WebSocketController{
 			messageDrl.setObject(drl);
 			log.error("This document is already locked, and can only be unlocked by the user who locked it");
 		}
-
 		return messageDrl;
 	}
 	
@@ -117,18 +108,19 @@ public class WebSocketController{
 		
 		List<DocUsers> dus = docUserDao.findAllByDoc(doc);
 		
-		LinkedList<Users> users = new LinkedList<Users>();
+		LinkedList<String> users = new LinkedList<String>();
 		
 		for(DocUsers du : dus){
-			users.add(userDao.findOne(du.getUser().getUserId()));
+			Users userTemp = userDao.findOne(du.getUser().getUserId());
+			users.add(userTemp.getUserName());
 		}
 		for(DocUsers du : dus){
 			if(resLockDao.findOneByDocUsers(du) != null){
 				String userName = du.getUser().getUserName();
-				docWebSocketService.broadcastUsersToLockUser(userName, new Message<List<Users>>(users, "userUpdate"));
+				docWebSocketService.broadcastUsersToLockUser(userName, new Message<List<String>>(users, "userUpdate"));
 			}
 		}		
-		docWebSocketService.broadcastUsers(doc.getDocId(), new Message<List<Users>>(users, "userUpdate"));
+		docWebSocketService.broadcastUsers(doc.getDocId(), new Message<List<String>>(users, "userUpdate"));
 	}
 	
 	@MessageMapping("/autoSave")

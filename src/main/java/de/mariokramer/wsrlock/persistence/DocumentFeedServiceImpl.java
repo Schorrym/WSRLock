@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import de.mariokramer.wsrlock.model.Document;
 import de.mariokramer.wsrlock.model.DocumentResourceLock;
 import de.mariokramer.wsrlock.model.Message;
-import de.mariokramer.wsrlock.model.Users;
 
 @Service
 public class DocumentFeedServiceImpl implements DocumentFeedService {
@@ -32,12 +31,12 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	}
 	
 	@Override
-	public void broadcastUsersToLockUser(String userName, Message<List<Users>> users) {
+	public void broadcastUsersToLockUser(String userName, Message<List<String>> users) {
 		messaging.convertAndSendToUser(userName, "/queue/editMode", users);
 	}
 	
 	@Override
-	public void broadcastUsers(Long docId, Message<List<Users>> users) {
+	public void broadcastUsers(Long docId, Message<List<String>> users) {
 		messaging.convertAndSend("/topic/doc"+docId, users);
 	}
 

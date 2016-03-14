@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import de.mariokramer.wsrlock.persistence.CustomUserDetailsService;
+import de.mariokramer.wsrlock.persistence.UserDao;
 
 @EnableWebSecurity
 @Configuration
@@ -22,14 +23,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	UserDetailsService userDetailsService;
-	
 	@Autowired
-	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+	UserDao ud;
+	
+	@Override
+	@Autowired
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.inMemoryAuthentication().withUser("mario").password("test").roles("USER");
+		auth.inMemoryAuthentication().withUser("q").password("q").roles("USER");
 	}
+	
+//	@Autowired
+//	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+//		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+//	}
 	
 	@Bean(name = "passwordEncoder")
 	public PasswordEncoder passwordEncoder() {
+//		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
+//		Users user = new Users();
+//		user.setEnabled(1);
+//		user.setUserName("q");
+//		user.setUserPass(bc.encode("q"));	
+//		ud.save(user);
 		return new BCryptPasswordEncoder();
 	}
 
@@ -40,12 +56,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().requireCsrfProtectionMatcher(getMatcher());
-		http.logout().logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll().invalidateHttpSession(true)
-				.and()
-				.authorizeRequests().antMatchers("/resources/**").permitAll().antMatchers("/admin/**").hasRole("USER").anyRequest().authenticated()
-				.and()
-				.formLogin().loginPage("/login").permitAll().failureUrl("/login?error").defaultSuccessUrl("/start");
+		http.formLogin().loginPage("/login").permitAll().failureUrl("/login?error").defaultSuccessUrl("/start");
+		http.authorizeRequests()
+			.antMatchers("/resources/**").permitAll()
+			.anyRequest().authenticated();
+		http.logout().logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll().invalidateHttpSession(true);
 		http.headers().frameOptions().sameOrigin();
+		http.csrf().requireCsrfProtectionMatcher(getMatcher());
 	}
 }

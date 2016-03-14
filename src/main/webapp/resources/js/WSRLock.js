@@ -26,9 +26,9 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-	setInterval(function(){
-		conData.hashCode = sub('app', 'tokenCheck', handleToken);
-		}, 20000);
+	//setInterval(function(){
+	//	conData.hashCode = sub('app', 'tokenCheck', handleToken);
+	//	}, 20000);
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
@@ -49,6 +49,7 @@ function handleToken(incoming){
 	var payload = JSON.parse(incoming.body);
 	var object = payload.object;
 	var hashCode = payload.hash;
+	window.localStorage.setItem("pHash", hashCode);
 }
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
@@ -118,7 +119,7 @@ function userUpdate(userList){
 		$(".panel-body").remove();
 		for (var i = 0; i < userList.length; i++) {
 			var div = $("<div/>");
-			div.addClass("panel-body text-right").html(userList[i].userName);
+			div.addClass("panel-body text-right").html(userList[i]);
 			div.insertAfter("#userList");
 		}
 	}

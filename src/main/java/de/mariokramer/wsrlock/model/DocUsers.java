@@ -18,11 +18,11 @@ public class DocUsers {
 	@Column(name="duId")
 	private Long duId;	
 
-	@ManyToOne
+	@ManyToOne(optional=false)
 	@Target(value=Users.class)
 	private Users user;
 	
-	@ManyToOne
+	@ManyToOne(optional=false)
 	@Target(value=Document.class)
 	private Document doc;
 
