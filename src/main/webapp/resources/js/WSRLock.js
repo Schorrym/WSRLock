@@ -29,7 +29,7 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-	conData.hashCode = sub('app', 'tokenCheck', handleToken);
+	conData.hashCode = sub('app', 'tokenCreate', handleToken);
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
@@ -52,7 +52,7 @@ function handleToken(incoming){
 	var hashCode = payload.hash;
 	var md5 = $.md5(hashCode);
 	console.log("MD5: "+md5);
-	var base64 = $.base64.btoa(md5);
+	var base64 = $.base64.btoa(hashCode);
 	console.log("B64: "+base64);
 	window.localStorage.setItem("pChallenge", base64);
 }
@@ -143,8 +143,8 @@ function saveDoc(){
 	var docId = $("#docId").val();
 	var docValue = $("#docContent").val();
 	var savedDoc = JSON.stringify({'docId': docId,
-		  						   'docValue': docValue,
-		  						   'docVersion': docVersion,
+									'docValue': docValue,
+									'docVersion': docVersion,
 		  			});
 	conData.client.send("/app/saveDoc", {}, savedDoc);
 };
@@ -259,10 +259,11 @@ function handleDelDocBroadcast(incoming) {
 function addDoc(){	
 	var docName = $("#docName").val();
 	var docValue = $("#docValue").val();
+	var pChallenge = window.localStorage.getItem("pChallenge");
 	var newDoc = JSON.stringify({'docName': docName,
 		  						 'docValue': docValue
 		  			});
-	conData.client.send("/app/addDoc", {}, newDoc);
+	conData.client.send("/app/addDoc", {challenge: pChallenge}, newDoc);
 };
 
 //Server->Client -- Handles the message from server after adding a new document

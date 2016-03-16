@@ -23,7 +23,7 @@ public class Users {
 	private String userPass;
 	
 	@Column(name="userHash", length=32)
-	private int userHash;
+	private String userHash;
 	
 	@Column(name="enabled")
 	private int enabled;
@@ -60,10 +60,10 @@ public class Users {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public int getUserHash() {
+	public String getUserHash() {
 		return userHash;
 	}
-	public void setUserHash(int userHash) {
+	public void setUserHash(String userHash) {
 		this.userHash = userHash;
 	}
 }

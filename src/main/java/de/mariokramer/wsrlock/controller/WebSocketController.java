@@ -1,5 +1,6 @@
 package de.mariokramer.wsrlock.controller;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -61,45 +63,49 @@ public class WebSocketController{
 	@Autowired
 	private DocUsersDao docUserDao;	
 
-	@SuppressWarnings("rawtypes")
-	@MessageMapping("/testit")
-	public void testit(Message msg, Principal p) throws NoSuchAlgorithmException{
-		System.out.println("Base64: "+msg.getHash());
-		String base64 = msg.getHash();
-		String md5 = StringUtils.newStringUtf8(Base64.decodeBase64(base64));		
-		System.out.println("MD5: "+md5);
-		
-		MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] passBytes = md5.getBytes();
-        md.reset();
-        byte[] digested = md.digest(passBytes);
-        StringBuffer sb = new StringBuffer();
-        for(int i=0;i<digested.length;i++){
-            sb.append(Integer.toHexString(0xff & digested[i]));
-        }
-        System.out.println("randomNumDate: "+sb.toString());
-		System.out.println("Gewünscht: "+userDao.getUsersByUserName(p.getName()).getUserHash());
-		
-		int test = Integer.valueOf(sb.toString());
-		if(test == userDao.getUsersByUserName(p.getName()).getUserHash()){
-			System.out.println("JOJO");
+	private boolean checkChallenge(String base64, String userName){
+		String md5 = StringUtils.newStringUtf8(Base64.decodeBase64(base64));
+		String userHash = null;
+		try{
+			userHash = userDao.getUsersByUserName(userName).getUserHash();	
+		}catch (Exception e){
+			log.error("No User found "+e.getStackTrace());
 		}
+		
+		if(md5.equals(userHash) && userName != null){
+			return true;
+		}
+		return false;
+	}
+	
+	private String generateHash(String userName){
+		String randomNum = String.valueOf( 0 + (int)(Math.random() * Integer.MAX_VALUE) );		
+		String date = Long.toString(new Date().getTime());
+		String challenge = randomNum + userName + date;
+		String hash = null;
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("MD5");
+			md.update(challenge.getBytes(), 0, challenge.length());
+			hash = new BigInteger(1,md.digest()).toString(16);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return hash;
 	}
 	
 	@SuppressWarnings("rawtypes")
-	@SubscribeMapping("/tokenCheck")
+	@SubscribeMapping("/tokenCreate")
 	public Message createToken(Principal p){
-		String randomNum = String.valueOf( 0 + (int)(Math.random() * Integer.MAX_VALUE) );		
-		String date = Long.toString(new Date().getTime());
-		String hash = randomNum + p.getName() + date;
+		String hash = generateHash(p.getName());
 		try {
 			Users user = userDao.getUsersByUserName(p.getName());
-			user.setUserHash(Integer.parseInt((hash)));
+			user.setUserHash(hash);
 			userDao.save(user);			
 		} catch (Exception e) {
 			log.error("Problem with finding a User "+e.getStackTrace());
 		}
-		System.out.println(hash);
 		return new Message(hash);
 	}
 	
@@ -243,7 +249,7 @@ public class WebSocketController{
 	
 	@MessageMapping("/editDoc")
 	@SendToUser("/queue/editMode")
-	public Message<DocumentResourceLock> editDoc(Document doc, Principal p, SimpMessageHeaderAccessor header){
+	public Message<DocumentResourceLock> editDoc(Document doc, Principal p){
 		doc = docDao.findOne(doc.getDocId());		
 		Users user = userDao.findOneByUserName(p.getName());		
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
@@ -289,14 +295,17 @@ public class WebSocketController{
 	}
 	
 	@MessageMapping("/addDoc")
-	public void addDocument(Document doc) {
-		
-		doc = docDao.save(doc);
-		if(doc.getDocValue().length() > 64){
-			doc.setDocValue(doc.getDocValue().substring(0,32) + "...");
+	public void addDocument(Document doc, Principal p, @Header(value="challenge") String challenge) {		
+		if(checkChallenge(challenge, p.getName())){		
+			doc = docDao.save(doc);
+			if(doc.getDocValue().length() > 64){
+				doc.setDocValue(doc.getDocValue().substring(0,32) + "...");
+			}
+			log.info("New Document added to database through WebSockets");
+			docWebSocketService.broadcastDocument(doc);
+		}else{
+			log.error("Smth went wrong in addDoc");
 		}
-		log.info("New Document added to database through WebSockets");
-		docWebSocketService.broadcastDocument(doc);
 	}
 	
 	@EventListener
