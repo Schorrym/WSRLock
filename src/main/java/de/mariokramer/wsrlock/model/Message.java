@@ -7,6 +7,9 @@ public class Message<T> {
 	private T object;
 	
 	public Message() {}
+	public Message(String hash) {
+		this.hash = hash;
+	}
 	public Message(T object, String task) {
 		this.object = object;
 		this.task = task;

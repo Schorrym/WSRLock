@@ -55,7 +55,8 @@
 									</td>
 								</tr>							
 						</tbody>
-					</table>					
+					</table>
+					<button id="test" onclick="testit()">TEST</button>					
 				</div>
 			</div>
 		</section>

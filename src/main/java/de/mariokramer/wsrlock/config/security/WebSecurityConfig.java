@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import de.mariokramer.wsrlock.model.Users;
 import de.mariokramer.wsrlock.persistence.CustomUserDetailsService;
 import de.mariokramer.wsrlock.persistence.UserDao;
 
@@ -26,25 +27,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	UserDao ud;
 	
-	@Override
-	@Autowired
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("mario").password("test").roles("USER");
-		auth.inMemoryAuthentication().withUser("q").password("q").roles("USER");
-	}
-	
+//	@Override
 //	@Autowired
-//	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-//		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//		auth.inMemoryAuthentication().withUser("mario").password("test").roles("USER");
+//		auth.inMemoryAuthentication().withUser("q").password("q").roles("USER");
 //	}
+	
+	@Autowired
+	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+		auth.eraseCredentials(false);
+		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+	}
 	
 	@Bean(name = "passwordEncoder")
 	public PasswordEncoder passwordEncoder() {
-//		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
+//		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();		
+//		
 //		Users user = new Users();
 //		user.setEnabled(1);
-//		user.setUserName("q");
-//		user.setUserPass(bc.encode("q"));	
+//		user.setUserName("mario");
+//		user.setUserPass(bc.encode("test"));	
 //		ud.save(user);
 		return new BCryptPasswordEncoder();
 	}

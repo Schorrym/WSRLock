@@ -1,3 +1,6 @@
+//En- Decoding
+if (!window.btoa) window.btoa = $.base64.btoa;
+if (!window.atob) window.atob = $.base64.atob;
 //Url pointing to the STOMP Endpoint of the Server
 var url = 'http://' + window.location.host + '/wsrlock/readDocument';
 //New SockJS Connection is opened (Local) by using the sockjs.js Client-Library
@@ -26,9 +29,7 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-	//setInterval(function(){
-	//	conData.hashCode = sub('app', 'tokenCheck', handleToken);
-	//	}, 20000);
+	conData.hashCode = sub('app', 'tokenCheck', handleToken);
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
@@ -49,8 +50,18 @@ function handleToken(incoming){
 	var payload = JSON.parse(incoming.body);
 	var object = payload.object;
 	var hashCode = payload.hash;
-	window.localStorage.setItem("pHash", hashCode);
+	var md5 = $.md5(hashCode);
+	console.log("MD5: "+md5);
+	var base64 = $.base64.btoa(md5);
+	console.log("B64: "+base64);
+	window.localStorage.setItem("pChallenge", base64);
 }
+
+function testit(){
+	var pChallenge = window.localStorage.getItem("pChallenge");
+	var pJson = JSON.stringify({'hash':pChallenge});
+	conData.client.send("/app/testit", {}, pJson);
+};
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
 function editDoc(){

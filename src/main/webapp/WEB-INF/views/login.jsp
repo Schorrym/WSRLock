@@ -30,7 +30,7 @@
         <sec:csrfInput/>
         <button class="btn btn-lg btn-primary btn-block" type="submit" id="connect" name="submit">Sign in</button>
       </form>
-
+		
     </div> <!-- /container -->    
 
   </body>

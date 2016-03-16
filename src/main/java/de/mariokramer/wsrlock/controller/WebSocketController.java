@@ -1,11 +1,19 @@
 package de.mariokramer.wsrlock.controller;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.Timestamp;
+
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
+import javax.websocket.server.ServerContainer;
 
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +26,7 @@ import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import de.mariokramer.wsrlock.model.DocUsers;
 import de.mariokramer.wsrlock.model.Document;
@@ -52,18 +61,46 @@ public class WebSocketController{
 	@Autowired
 	private DocUsersDao docUserDao;	
 
+	@SuppressWarnings("rawtypes")
+	@MessageMapping("/testit")
+	public void testit(Message msg, Principal p) throws NoSuchAlgorithmException{
+		System.out.println("Base64: "+msg.getHash());
+		String base64 = msg.getHash();
+		String md5 = StringUtils.newStringUtf8(Base64.decodeBase64(base64));		
+		System.out.println("MD5: "+md5);
+		
+		MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] passBytes = md5.getBytes();
+        md.reset();
+        byte[] digested = md.digest(passBytes);
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<digested.length;i++){
+            sb.append(Integer.toHexString(0xff & digested[i]));
+        }
+        System.out.println("randomNumDate: "+sb.toString());
+		System.out.println("Gewünscht: "+userDao.getUsersByUserName(p.getName()).getUserHash());
+		
+		int test = Integer.valueOf(sb.toString());
+		if(test == userDao.getUsersByUserName(p.getName()).getUserHash()){
+			System.out.println("JOJO");
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
 	@SubscribeMapping("/tokenCheck")
-	public Message<Document> createToken(Principal p){
-		String userName = p.getName();
-		
-		
-		Users user = userDao.findOneByUserName(userName);
-		user.setUserHash(p.hashCode());		
-		userDao.save(user);
-		Message<Document> msg = new Message<Document>();
-		msg.setHash("bla");
-		
-		return msg;
+	public Message createToken(Principal p){
+		String randomNum = String.valueOf( 0 + (int)(Math.random() * Integer.MAX_VALUE) );		
+		String date = Long.toString(new Date().getTime());
+		String hash = randomNum + p.getName() + date;
+		try {
+			Users user = userDao.getUsersByUserName(p.getName());
+			user.setUserHash(Integer.parseInt((hash)));
+			userDao.save(user);			
+		} catch (Exception e) {
+			log.error("Problem with finding a User "+e.getStackTrace());
+		}
+		System.out.println(hash);
+		return new Message(hash);
 	}
 	
 	@MessageMapping("/checkDoc")
@@ -71,7 +108,8 @@ public class WebSocketController{
 	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p){
 		
 		Users user = null;
-		user = userDao.findOneByUserName(p.getName());
+		System.out.println(p.getName());
+		user = userDao.getUsersByUserName(p.getName());
 		
 		//Check whether document-users combination already exists or not
 		doc = docDao.findOne(doc.getDocId());		
@@ -235,6 +273,7 @@ public class WebSocketController{
 			messageDrl.setObject(drl);
 			log.error("This document is already locked, and can only be unlocked by the user who locked it");
 		}
+		messageDrl.getObject().getDocUsers().getUser().setUserPass("");
 		return messageDrl;
 	}
 	
