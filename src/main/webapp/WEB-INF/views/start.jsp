@@ -55,14 +55,15 @@
 									</td>
 								</tr>							
 						</tbody>
-					</table>
-					<button id="test" onclick="testit()">TEST</button>					
+					</table>			
 				</div>
 			</div>
 		</section>
 		<!-- Ende row2 -->
 	</div>
 	<!-- Ende Container -->
+	<sec:authentication property="credentials" var="cred"/>
+	
 	<input type="hidden" id="pageName" value="start">
 	<input type="hidden" id="sessionId" value="${pageContext.session.id}">
 </body>

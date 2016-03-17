@@ -29,7 +29,8 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-	conData.hashCode = sub('app', 'tokenCreate', handleToken);
+	conData.hashCode = sub('user', 'getChallenge', handleChallenge);
+	conData.client.send("/app/tokenCreate", {}, docId);
 	if(pageName == "start"){	
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
@@ -37,30 +38,36 @@ conData.client.connect(headers, function(frame){
 		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
 		conData.checkSub = sub('topic', 'checkDoc', handleCheckDoc);
 		var docId = JSON.stringify({'docId': currDocId});
-		conData.client.send("/app/checkDoc", {}, docId);
+		
+		conData.client.send("/app/checkDoc", {challenge: window.localStorage.getItem("pChallenge")}, docId);		
 		setInterval(function(){
-			conData.client.send("/app/broadcastUser", {}, docId);
+			conData.client.send("/app/broadcastUser", {challenge: window.localStorage.getItem("pChallenge")}, docId);
 			}, 5000);
 	}else{
 		conData.client.disconnect();
 	}
 });
 
-function handleToken(incoming){
-	var payload = JSON.parse(incoming.body);
-	var object = payload.object;
-	var hashCode = payload.hash;
-	var md5 = $.md5(hashCode);
+//Set the challenge given by the server to a CRAM MD5
+function setHash(challenge){
+	
+	var md5 = $.md5(challenge);
 	console.log("MD5: "+md5);
-	var base64 = $.base64.btoa(hashCode);
+	var base64 = $.base64.btoa(challenge);
 	console.log("B64: "+base64);
 	window.localStorage.setItem("pChallenge", base64);
-}
+};
 
-function testit(){
-	var pChallenge = window.localStorage.getItem("pChallenge");
-	var pJson = JSON.stringify({'hash':pChallenge});
-	conData.client.send("/app/testit", {}, pJson);
+//Get the generated Hash (Base64) from local Storage
+function getHash(){
+	return window.localStorage.getItem("pChallenge");
+};
+
+//Server-Client -- Challenge comes from server
+function handleChallenge(incoming){
+	var payload = JSON.parse(incoming.body);
+	var hashCode = payload.hash;
+	setHash(hashCode);
 };
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
@@ -68,7 +75,7 @@ function editDoc(){
 	conData.docSub.unsubscribe();
 	conData.lockSub = sub('user', 'editMode', handleLockIncome);
 	var editDoc = JSON.stringify({'docId': currDocId});
-	conData.client.send("/app/editDoc", {}, editDoc);
+	conData.client.send("/app/editDoc", {challenge: getHash()}, editDoc);
 };
 
 //This is for locking the view when someone else are editing the document
@@ -117,7 +124,7 @@ function handleDocBroadcast(incoming) {
 		lockView();
 	}else if(task == "lockView"){
 		lockView();
-	}else if(task == "newDoc"){		
+	}else if(task == "newDoc" || task == "timeOver"){		
 		freeView(object);
 	}else if(task == "userUpdate"){
 		userUpdate(object);
@@ -146,14 +153,14 @@ function saveDoc(){
 									'docValue': docValue,
 									'docVersion': docVersion,
 		  			});
-	conData.client.send("/app/saveDoc", {}, savedDoc);
+	conData.client.send("/app/saveDoc", {challenge: getHash()}, savedDoc);
 };
 
-//auto save the value of textarea while in writemode of a document
+//Client->Server -- Auto save the value of textarea while in writemode of a document
 function autoSave(){
 	var autoValue = JSON.stringify({'docId': $("#docId").val(),
 									'docValue': $("#docContent").val()});
-	conData.client.send("/app/autoSave", {}, autoValue);
+	conData.client.send("/app/autoSave", {challenge: getHash()}, autoValue);
 	return;
 };
 
@@ -196,43 +203,11 @@ function handleLockIncome(incoming){
 	}
 };
 
-//Server->Client -- Handles the message from the Server when saving a edited document succeeded (no broadcast, user unique)
-//function handleSaveSuccessIncome(incoming){	
-//	
-//	//if saved
-//	conData.lockSub.unsubscribe();
-//	conData.saveSub.unsubscribe();
-//	$("#docContent").prop("disabled", true);
-//	$("#editButton").show();
-//	$("#exit").show();
-//	$("#save").hide();
-//	$("#status").text("reading");
-//	var currDocId = $("#docId").val();
-//	conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast); 
-//	console.log('document was saved');
-//	
-//	//if locked
-//	
-//};
-
-
-//function handleLockSuccessIncome(incoming){
-//	var lockDoc = JSON.parse(incoming.body);
-//	
-//	$("#docContent").prop("disabled", false);
-//	$("#editButton").hide();
-//	$("#exit").hide();
-//	$("#save").show();
-//	$("#status").text("writing");	
-//	
-//	console.log('Document is locked for you: '+lockDoc.task);	
-//};
-
-//When clicking the 'leave document' button on a specific document
+//Client->Server -- When clicking the 'leave document' button on a specific document
 function leaveDoc(){
 	conData.docSub.unsubscribe();
 	var leave = JSON.stringify({'task': $("#docId").val()});
-	conData.client.send("/app/leaveDoc", {}, leave)
+	conData.client.send("/app/leaveDoc", {challenge: getHash()}, leave)
 };
 
 //When clicking 'show' on start page to show a specific document
@@ -245,7 +220,7 @@ function showDoc(){
 //Client->Server -- When deleting a document on start.jsp page
 function delDoc(docId){
 	var delDoc = JSON.stringify({'docId': docId});
-	conData.client.send("/app/delDoc", {}, delDoc);
+	conData.client.send("/app/delDoc", {challenge: getHash()}, delDoc);
 };
 
 //Server->Client -- Handles the message from server after deleting a document
@@ -259,11 +234,10 @@ function handleDelDocBroadcast(incoming) {
 function addDoc(){	
 	var docName = $("#docName").val();
 	var docValue = $("#docValue").val();
-	var pChallenge = window.localStorage.getItem("pChallenge");
 	var newDoc = JSON.stringify({'docName': docName,
 		  						 'docValue': docValue
 		  			});
-	conData.client.send("/app/addDoc", {challenge: pChallenge}, newDoc);
+	conData.client.send("/app/addDoc", {challenge: getHash()}, newDoc);
 };
 
 //Server->Client -- Handles the message from server after adding a new document

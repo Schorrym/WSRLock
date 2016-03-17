@@ -54,4 +54,9 @@ public class DocumentFeedServiceImpl implements DocumentFeedService {
 	public void timeOverMessage(String userName, Message<Document> doc) {
 		messaging.convertAndSendToUser(userName, "/queue/editMode", doc);		
 	}
+
+	@Override
+	public void sendChallengeToUser(String userName, @SuppressWarnings("rawtypes") Message msg) {
+		messaging.convertAndSendToUser(userName, "/queue/getChallenge", msg);
+	}
 }
