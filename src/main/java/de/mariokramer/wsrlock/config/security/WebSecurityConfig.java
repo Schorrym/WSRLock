@@ -1,5 +1,7 @@
 package de.mariokramer.wsrlock.config.security;
 
+import java.security.MessageDigest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,19 +39,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
 		auth.eraseCredentials(false);
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		auth.userDetailsService(userDetailsService);//.passwordEncoder(passwordEncoder());
 	}
 	
 	@Bean(name = "passwordEncoder")
 	public PasswordEncoder passwordEncoder() {
-//		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();		
+//		BCryptPasswordEncoder bc = new BCryptPasswordEncoder(4);		
 //		
-//		Users user = new Users();
-//		user.setEnabled(1);
-//		user.setUserName("mario");
-//		user.setUserPass(bc.encode("test"));	
+//		Users user = ud.getUsersByUserName("q");
+//		user.setUserPass("q");	
 //		ud.save(user);
-		return new BCryptPasswordEncoder();
+
+		return new BCryptPasswordEncoder(4);
 	}
 
 	@Bean(name = "getMatcher")

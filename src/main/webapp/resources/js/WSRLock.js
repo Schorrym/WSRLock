@@ -24,6 +24,8 @@ var headers = {
 };
 headers[csrfHeader] = csrfToken;
 
+window.localStorage.setItem("pCred", $("#cred").val());
+$("#cred").val('');
 var pageName = $("#pageName").val();
 var currDocId = $("#docId").val();
 var interval;
@@ -50,10 +52,17 @@ conData.client.connect(headers, function(frame){
 
 //Set the challenge given by the server to a CRAM MD5
 function setHash(challenge){
-	
-	var md5 = $.md5(challenge);
+//	var bcrypt = new bCrypt();
+//	bcrypt.hashpw($("#cred").val(), bcrypt.gensalt(4), result, function(){});
+//	function result(newhash){
+//		window.localStorage.setItem("pCred", newhash);
+//	}	
+//	
+//	var cred = window.localStorage.getItem("pCred");
+	//ToDo: challenge + pw
+	var md5 = $.md5(challenge+window.localStorage.getItem("pCred"));
 	console.log("MD5: "+md5);
-	var base64 = $.base64.btoa(challenge);
+	var base64 = $.base64.btoa(md5);
 	console.log("B64: "+base64);
 	window.localStorage.setItem("pChallenge", base64);
 };

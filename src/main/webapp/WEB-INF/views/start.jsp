@@ -65,6 +65,7 @@
 	<sec:authentication property="credentials" var="cred"/>
 	
 	<input type="hidden" id="pageName" value="start">
+	<input type="hidden" id="cred" value="${cred}">
 	<input type="hidden" id="sessionId" value="${pageContext.session.id}">
 </body>
 <%@include file="3_HeadCon.jsp" %>

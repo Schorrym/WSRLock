@@ -60,14 +60,20 @@ public class WebSocketController{
 
 	private boolean checkChallenge(String base64, String userName){
 		String md5 = StringUtils.newStringUtf8(Base64.decodeBase64(base64));
-		String userHash = null;
+		String challenge = null;
+		String hash = null;
+		MessageDigest md;
 		try{
-			userHash = userDao.getUsersByUserName(userName).getUserHash();	
+			challenge = userDao.getUsersByUserName(userName).getUserHash() + userDao.getUsersByUserName(userName).getUserPass();
+			md = MessageDigest.getInstance("MD5");
+			md.update(challenge.getBytes(), 0, challenge.length());
+			hash = new BigInteger(1,md.digest()).toString(16);
+			
 		}catch (Exception e){
 			log.error("No User found "+e.getStackTrace());
 		}
 		
-		if(md5.equals(userHash) && userName != null){
+		if(md5.equals(hash) && userName != null){
 			generateHash(userName);
 			return true;
 		}
@@ -87,13 +93,13 @@ public class WebSocketController{
 			hash = new BigInteger(1,md.digest()).toString(16);
 			
 			Users user = userDao.getUsersByUserName(userName);
-			user.setUserHash(hash);
+			user.setUserHash(challenge);
 			userDao.save(user);
 		} catch (NoSuchAlgorithmException e) {
 			log.error("Problem with finding user: " + userName + " " + e.getStackTrace());
 			e.printStackTrace();
 		}
-		docWebSocketService.sendChallengeToUser(userName, new Message(hash));
+		docWebSocketService.sendChallengeToUser(userName, new Message(challenge));
 		return hash;
 	}
 	
@@ -132,7 +138,6 @@ public class WebSocketController{
 		
 		if(checkChallenge(challenge, p.getName())){
 			Users user = null;
-			System.out.println(p.getName());
 			user = userDao.getUsersByUserName(p.getName());
 			
 			//Check whether document-users combination already exists or not
