@@ -60,7 +60,7 @@ function setHash(challenge){
 //	
 //	var cred = window.localStorage.getItem("pCred");
 	//ToDo: challenge + pw
-	var md5 = $.md5(challenge+window.localStorage.getItem("pCred"));
+	var md5 = $.md5(challenge + window.localStorage.getItem("pCred"));
 	console.log("MD5: "+md5);
 	var base64 = $.base64.btoa(md5);
 	console.log("B64: "+base64);

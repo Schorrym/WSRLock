@@ -22,7 +22,7 @@ public class Users {
 	@Column(name="userPass", nullable=false)
 	private String userPass;
 	
-	@Column(name="userHash", length=32)
+	@Column(name="userHash")
 	private String userHash;
 	
 	@Column(name="enabled")
