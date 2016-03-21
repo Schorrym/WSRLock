@@ -24,8 +24,6 @@ var headers = {
 };
 headers[csrfHeader] = csrfToken;
 
-window.localStorage.setItem("pCred", $("#cred").val());
-$("#cred").val('');
 var pageName = $("#pageName").val();
 var currDocId = $("#docId").val();
 var interval;
@@ -33,7 +31,9 @@ var interval;
 conData.client.connect(headers, function(frame){
 	conData.hashCode = sub('user', 'getChallenge', handleChallenge);
 	conData.client.send("/app/tokenCreate", {}, docId);
-	if(pageName == "start"){	
+	if(pageName == "start"){
+		window.localStorage.setItem("pCred", $("#cred").val());
+		$("#cred").val('');
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
 	}else if(pageName == "readdoc"){
@@ -59,11 +59,12 @@ function setHash(challenge){
 //	}	
 //	
 //	var cred = window.localStorage.getItem("pCred");
-	//ToDo: challenge + pw
+//	console.log("CHALL: "+challenge);
+//	console.log("PASS: "+window.localStorage.getItem("pCred"));
 	var md5 = $.md5(challenge + window.localStorage.getItem("pCred"));
-	console.log("MD5: "+md5);
+//	console.log("MD5: "+md5);
 	var base64 = $.base64.btoa(md5);
-	console.log("B64: "+base64);
+//	console.log("B64: "+base64);
 	window.localStorage.setItem("pChallenge", base64);
 };
 
