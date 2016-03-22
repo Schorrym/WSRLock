@@ -29,6 +29,7 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
+//	conData.client.debug = null;
 	conData.hashCode = sub('user', 'getChallenge', handleChallenge);
 	conData.client.send("/app/tokenCreate", {}, docId);
 	if(pageName == "start"){

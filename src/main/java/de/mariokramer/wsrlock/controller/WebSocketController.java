@@ -22,6 +22,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
@@ -337,7 +339,8 @@ public class WebSocketController{
 	
 	@MessageMapping("/addDoc")
 	public void addDocument(Document doc, Principal p, 
-			@Header(value="challenge") String challenge) {		
+			@Header(value="challenge") String challenge, StompHeaderAccessor sh) {		
+		System.out.println(sh.getHeader("testhead"));
 		if(checkChallenge(challenge, p.getName())){
 			doc = docDao.save(doc);
 			if(doc.getDocValue().length() > 64){
