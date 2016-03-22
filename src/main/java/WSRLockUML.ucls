@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.9" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
+  realizations="true" associations="true" dependencies="true" nesting-relationships="true" router="FAN">  
+  <class id="1" language="java" name="de.mariokramer.wsrlock.model.Users" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/model/Users.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="369" width="150" x="1447" y="1765"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="de.mariokramer.wsrlock.persistence.CustomUserDetails" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/CustomUserDetails.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1893" y="1479"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="de.mariokramer.wsrlock.model.Message" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/model/Message.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="279" width="137" x="392" y="1073"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="de.mariokramer.wsrlock.config.security.WebSecurityConfig" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/config/security/WebSecurityConfig.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1540" y="534"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="de.mariokramer.wsrlock.controller.MainController" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/controller/MainController.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="117" width="292" x="38" y="453"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="de.mariokramer.wsrlock.persistence.CustomUserDetailsService" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/CustomUserDetailsService.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1573" y="833"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="de.mariokramer.wsrlock.persistence.DocumentFeedServiceImpl" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/DocumentFeedServiceImpl.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="243" width="336" x="370" y="453"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="8" language="java" name="de.mariokramer.wsrlock.persistence.UserDao" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/UserDao.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1437" y="1146"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="9" language="java" name="de.mariokramer.wsrlock.persistence.DocumentFeedService" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/DocumentFeedService.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="207" width="336" x="392" y="826"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="10" language="java" name="de.mariokramer.wsrlock.model.DocUsers" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/model/DocUsers.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="162" x="855" y="1482"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="de.mariokramer.wsrlock.controller.WebSocketController" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/controller/WebSocketController.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="333" width="381" x="812" y="453"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="12" language="java" name="de.mariokramer.wsrlock.persistence.DocumentDao" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/DocumentDao.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="81" width="190" x="99" y="826"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="13" language="java" name="de.mariokramer.wsrlock.persistence.DocumentResourceLockDao" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/DocumentResourceLockDao.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="117" width="302" x="852" y="826"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="14" language="java" name="de.mariokramer.wsrlock.model.DocumentResourceLock" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/model/DocumentResourceLock.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="369" width="200" x="699" y="1073"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="15" language="java" name="de.mariokramer.wsrlock.persistence.DocUsersDao" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/DocUsersDao.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="135" width="278" x="960" y="1073"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="16" language="java" name="de.mariokramer.wsrlock.model.Document" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/model/Document.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="478" y="1673"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="17" language="java" name="de.mariokramer.wsrlock.persistence.UserRoleDao" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/persistence/UserRoleDao.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1706" y="1107"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="18" language="java" name="de.mariokramer.wsrlock.model.UserRole" project="WSRLock" 
+    file="/WSRLock/src/main/java/de/mariokramer/wsrlock/model/UserRole.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="148" x="1487" y="1482"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
+      <operations public="true" package="false" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <association id="19">    
+    <bendpoint x="1331" y="826"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="20" name="userDao"/>      
+      <multiplicity id="21" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="22">    
+    <bendpoint x="1205" y="826"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="23" name="docUserDao"/>      
+      <multiplicity id="24" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="25">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="26" name="userRoleDao"/>      
+      <multiplicity id="27" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="17" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="28">    
+    <bendpoint x="361" y="1073"/>    
+    <bendpoint x="361" y="1482"/>    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <realization id="29">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="9"/>  
+  </realization>  
+  <dependency id="30">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="31">    
+    <bendpoint x="1665" y="1482"/>    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <dependency id="32">    
+    <bendpoint x="47" y="826"/>    
+    <bendpoint x="47" y="1073"/>    
+    <bendpoint x="47" y="1482"/>    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <association id="33">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="34" name="docWebSocketService"/>      
+      <multiplicity id="35" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="36">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="37" name="docDao"/>      
+      <multiplicity id="38" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="39">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="40" name="docUsers"/>      
+      <multiplicity id="41" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="42">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <dependency id="43">    
+    <bendpoint x="1047" y="1482"/>    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <dependency id="44">    
+    <bendpoint x="68" y="826"/>    
+    <bendpoint x="68" y="1073"/>    
+    <bendpoint x="68" y="1482"/>    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <dependency id="45">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="18"/>  
+  </dependency>  
+  <association id="46">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="47" name="resLockDao"/>      
+      <multiplicity id="48" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="49">    
+    <bendpoint x="2306" y="1073"/>    
+    <bendpoint x="2327" y="1482"/>    
+    <bendpoint x="2327" y="1765"/>    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <dependency id="50">    
+    <bendpoint x="1247" y="826"/>    
+    <bendpoint x="1289" y="1073"/>    
+    <bendpoint x="1289" y="1482"/>    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <dependency id="51">    
+    <bendpoint x="2285" y="1073"/>    
+    <bendpoint x="2285" y="1482"/>    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <dependency id="52">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="14"/>  
+  </dependency>  
+  <dependency id="53">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <dependency id="54">    
+    <bendpoint x="319" y="826"/>    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="3"/>  
+  </dependency>  
+  <association id="55">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="56" name="user"/>      
+      <multiplicity id="57" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="58">    
+    <bendpoint x="758" y="826"/>    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="14"/>  
+  </dependency>  
+  <dependency id="59">    
+    <bendpoint x="800" y="826"/>    
+    <bendpoint x="668" y="1073"/>    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="60">    
+    <bendpoint x="1213" y="1482"/>    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <generalization id="61">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <association id="62">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="63" name="doc"/>      
+      <multiplicity id="64" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="16" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="65">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="3"/>  
+  </dependency>  
+  <dependency id="66">    
+    <bendpoint x="361" y="826"/>    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="3"/>  
+  </dependency>  
+  <association id="67">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="68" name="docDao"/>      
+      <multiplicity id="69" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="70">    
+    <bendpoint x="234" y="1073"/>    
+    <bendpoint x="234" y="1482"/>    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <dependency id="71">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="14"/>  
+  </dependency>  
+  <dependency id="72">    
+    <bendpoint x="821" y="826"/>    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="14"/>  
+  </dependency>  
+  <dependency id="73">    
+    <bendpoint x="340" y="826"/>    
+    <bendpoint x="340" y="1073"/>    
+    <bendpoint x="340" y="1482"/>    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="16"/>  
+  </dependency>  
+  <association id="74">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="75" name="userDao"/>      
+      <multiplicity id="76" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="77">    
+    <bendpoint x="929" y="1073"/>    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="false" protected="true" private="true" static="true"/>    
+    <operations public="true" package="false" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

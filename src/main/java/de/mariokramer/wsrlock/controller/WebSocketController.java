@@ -233,8 +233,9 @@ public class WebSocketController{
 		}				
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@MessageMapping("/leaveDoc")
-	public void leaveDoc(Message<List<Users>> msg, Principal p, 
+	public void leaveDoc(Message msg, Principal p, 
 			@Header(value="challenge") String challenge){
 		
 		if(checkChallenge(challenge, p.getName())){
@@ -339,8 +340,8 @@ public class WebSocketController{
 	
 	@MessageMapping("/addDoc")
 	public void addDocument(Document doc, Principal p, 
-			@Header(value="challenge") String challenge, StompHeaderAccessor sh) {		
-		System.out.println(sh.getHeader("testhead"));
+			@Header(value="challenge") String challenge) {		
+
 		if(checkChallenge(challenge, p.getName())){
 			doc = docDao.save(doc);
 			if(doc.getDocValue().length() > 64){

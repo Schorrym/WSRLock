@@ -60,12 +60,12 @@ function setHash(challenge){
 //	}	
 //	
 //	var cred = window.localStorage.getItem("pCred");
-//	console.log("CHALL: "+challenge);
-//	console.log("PASS: "+window.localStorage.getItem("pCred"));
+	console.log("CHALL: "+challenge);
+	console.log("PASS: "+window.localStorage.getItem("pCred"));
 	var md5 = $.md5(challenge + window.localStorage.getItem("pCred"));
-//	console.log("MD5: "+md5);
+	console.log("MD5: "+md5);
 	var base64 = $.base64.btoa(md5);
-//	console.log("B64: "+base64);
+	console.log("B64: "+base64);
 	window.localStorage.setItem("pChallenge", base64);
 };
 
@@ -77,7 +77,7 @@ function getHash(){
 //Server-Client -- Challenge comes from server
 function handleChallenge(incoming){
 	var payload = JSON.parse(incoming.body);
-	var hashCode = payload.hash;
+	var hashCode = payload.challenge;
 	setHash(hashCode);
 };
 

@@ -2,24 +2,24 @@ package de.mariokramer.wsrlock.model;
 
 public class Message<T> {
 
-	private String hash;
+	private String challenge;
 	private String task;
 	private T object;
 	
 	public Message() {}
-	public Message(String hash) {
-		this.hash = hash;
+	public Message(String challenge) {
+		this.challenge = challenge;
 	}
 	public Message(T object, String task) {
 		this.object = object;
 		this.task = task;
 	}
 	
-	public String getHash() {
-		return hash;
+	public String getChallenge() {
+		return challenge;
 	}
-	public void setHash(String hash) {
-		this.hash = hash;
+	public void setChallenge(String challenge) {
+		this.challenge = challenge;
 	}
 	public String getTask() {
 		return task;
