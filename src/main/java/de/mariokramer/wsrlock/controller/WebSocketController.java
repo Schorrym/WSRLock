@@ -2,7 +2,6 @@ package de.mariokramer.wsrlock.controller;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 
 import java.util.Date;
@@ -22,8 +21,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
@@ -58,15 +55,25 @@ public class WebSocketController{
 	@Autowired
 	private UserDao userDao;
 	@Autowired
-	private DocUsersDao docUserDao;	
+	private DocUsersDao docUserDao;
+	
+	private boolean check = false;
 
 	private boolean checkChallenge(String base64, String userName){
+		Users user = null;
+		try {
+			user = userDao.getUsersByUserName(userName);
+		} catch (Exception e) {
+			log.error("User: "+user.getUserName()+" was not found");
+			e.getStackTrace();
+		}
+		
 		String md5 = StringUtils.newStringUtf8(Base64.decodeBase64(base64));
 		String challenge = null;
 		String hash = null;
 		MessageDigest md;
 		try{
-			challenge = userDao.getUsersByUserName(userName).getUserHash() + userDao.getUsersByUserName(userName).getUserPass();
+			challenge = user.getUserHash() + user.getjSession();
 			md = MessageDigest.getInstance("MD5");
 			md.update(challenge.getBytes(), 0, challenge.length());
 			hash = new BigInteger(1,md.digest()).toString(16);
@@ -76,38 +83,34 @@ public class WebSocketController{
 		}
 		
 		if(md5.equals(hash) && userName != null){
-			generateHash(userName);
+			generateChallenge(user);
 			return true;
 		}
 		return false;
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private String generateHash(String userName){
+	private String generateChallenge(Users user){
 		String randomNum = String.valueOf( 0 + (int)(Math.random() * Integer.MAX_VALUE) );		
 		String date = Long.toString(new Date().getTime());
-		String challenge = randomNum + userName + date;
+		String challenge = randomNum + date;
 		String hash = null;
-		MessageDigest md;
 		try {
-			md = MessageDigest.getInstance("MD5");
-			md.update(challenge.getBytes(), 0, challenge.length());
-			hash = new BigInteger(1,md.digest()).toString(16);
-			
-			Users user = userDao.getUsersByUserName(userName);
+//			user = userDao.findOne(user.getUserId());
 			user.setUserHash(challenge);
 			userDao.save(user);
-		} catch (NoSuchAlgorithmException e) {
-			log.error("Problem with finding user: " + userName + " " + e.getStackTrace());
+		} catch (Exception e) {
+			log.error("Problem with finding user: " + user.getUserName() + " " + e.getStackTrace());
 			e.printStackTrace();
 		}
-		docWebSocketService.sendChallengeToUser(userName, new Message(challenge));
+		String base64 = StringUtils.newStringUtf8(Base64.encodeBase64(challenge.getBytes()));
+		docWebSocketService.sendChallengeToUser(user.getUserName(), new Message(base64));
 		return hash;
 	}
 	
 	//Only allow one user at a time to check if the resource is free or already in use
 	private String checkResourceLock(String userName, Long docId){
-		Users user = userDao.findOneByUserName(userName);
+		Users user = userDao.getUsersByUserName(userName);
 		Document doc = docDao.findOne(docId);
 		DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
 		List<DocumentResourceLock> drls = resLockDao.findAll();
@@ -128,9 +131,12 @@ public class WebSocketController{
 	}
 
 	@MessageMapping("/tokenCreate")
-	public void createToken(Principal p){		
-		if(userDao.getUsersByUserName(p.getName()) != null)
-			generateHash(p.getName());
+	public void createToken(Principal p, @Header(value="userObj") String userObj){
+		Users user = userDao.getUsersByUserName(p.getName());
+		if(user != null){
+			user.setjSession(userObj);
+			generateChallenge(user);
+		}			
 	}
 	
 	@MessageMapping("/checkDoc")
@@ -138,7 +144,7 @@ public class WebSocketController{
 	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			Users user = null;
 			user = userDao.getUsersByUserName(p.getName());
 			
@@ -179,7 +185,7 @@ public class WebSocketController{
 	public void broadcastUser(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			doc = docDao.findOne(doc.getDocId());		
 			List<DocUsers> dus = docUserDao.findAllByDoc(doc);		
 			LinkedList<String> users = new LinkedList<String>();
@@ -204,11 +210,11 @@ public class WebSocketController{
 	public void autoSave(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			String tempValue = doc.getDocValue();
 			doc = docDao.findOne(doc.getDocId());
 			
-			Users user = userDao.findOneByUserName(p.getName());
+			Users user = userDao.getUsersByUserName(p.getName());
 			DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
 			DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
 			
@@ -238,9 +244,9 @@ public class WebSocketController{
 	public void leaveDoc(Message msg, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			Document doc = docDao.findOne(Long.valueOf(msg.getTask()));
-			Users user = userDao.findOneByUserName(p.getName());
+			Users user = userDao.getUsersByUserName(p.getName());
 			DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
 			if(resLockDao.findOneByDocUsers(du) == null){
 				docUserDao.delete(du);
@@ -255,7 +261,7 @@ public class WebSocketController{
 	public Message<Document> saveDoc(Document doc, Principal p,
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			Long docVersion = doc.getDocVersion();
 			Document newDoc = docDao.findOne(doc.getDocId());
 			Users user = userDao.getUsersByUserName(p.getName());
@@ -284,9 +290,9 @@ public class WebSocketController{
 	@SendToUser("/queue/editMode")
 	public Message<DocumentResourceLock> editDoc(Document doc, Principal p,
 			@Header(value="challenge") String challenge){
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			doc = docDao.findOne(doc.getDocId());		
-			Users user = userDao.findOneByUserName(p.getName());		
+			Users user = userDao.getUsersByUserName(p.getName());		
 			DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
 			DocumentResourceLock drl = resLockDao.findOneByDocUsers(du);
 			Message<DocumentResourceLock> messageDrl = new Message<>();
@@ -325,7 +331,7 @@ public class WebSocketController{
 	@MessageMapping("/delDoc")
 	public void deleteDocument(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			if(docDao.findOne(doc.getDocId()) != null) {
 				docDao.delete(doc.getDocId());
 				docWebSocketService.deleteDocument(doc.getDocId());
@@ -342,7 +348,7 @@ public class WebSocketController{
 	public void addDocument(Document doc, Principal p, 
 			@Header(value="challenge") String challenge) {		
 
-		if(checkChallenge(challenge, p.getName())){
+		if(checkChallenge(challenge, p.getName()) || check){
 			doc = docDao.save(doc);
 			if(doc.getDocValue().length() > 64){
 				doc.setDocValue(doc.getDocValue().substring(0,32) + "...");

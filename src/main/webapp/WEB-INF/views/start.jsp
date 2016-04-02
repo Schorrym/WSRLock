@@ -11,10 +11,12 @@
 <%@include file="2_Head.jsp"%>
 
 <title>Documents Overview</title>
-
+<script type="text/javascript">
+window.localStorage.setItem("jSession", '${pageContext.session.id}');
+</script>
 </head>
 
-<body onload="">
+<body>
 	<%@include file="4_Navbar.jsp"%>
 	<div class="container">
 		<section class="row">
@@ -61,12 +63,8 @@
 		</section>
 		<!-- Ende row2 -->
 	</div>
-	<!-- Ende Container -->
-	<sec:authentication property="credentials" var="cred"/>
-	
+	<!-- Ende Container -->	
 	<input type="hidden" id="pageName" value="start">
-	<input type="hidden" id="cred" value="${cred}">
-	<input type="hidden" id="sessionId" value="${pageContext.session.id}">
 </body>
 <%@include file="3_HeadCon.jsp" %>
 </html>

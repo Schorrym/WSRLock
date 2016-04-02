@@ -8,6 +8,40 @@ var sock = new SockJS(url);
 
 //Create namespace for Connection
 var conData = {};
+
+//Gets the geoLocation from the Browsers Navigator Object
+function getGeoLocation(){
+	var options = {
+			  enableHighAccuracy: true,
+			  timeout: 5000,
+			  maximumAge: 0
+			};
+
+			function success(pos) {
+			  var crd = pos.coords;
+			  conData.posLatitude = crd.latitude;
+			  conData.posLongitude = crd.longitude;
+			};
+
+			function error(err) {
+			  console.warn('ERROR(' + err.code + '): ' + err.message);
+			};
+
+			navigator.geolocation.getCurrentPosition(success, error, options);
+};
+
+//Collects all information within the Navigator Object to identify the Client-side
+conData.getUserObjects = function(){	
+	var useObj = JSON.stringify({'userAgent': navigator.userAgent,
+									'appVersion': navigator.appVersion,
+									'platform': navigator.platform,
+									'appName': navigator.appName,
+//									'posLatitude': conData.posLatitude,
+//									'posLongitude': conData.posLongitude,
+									'jSession': window.localStorage.getItem("jSession")});
+	return useObj;
+};
+
 //Defining that STOMP will be used with the SockJS Protocol as fallback options
 conData.client = Stomp.over(sock);
 
@@ -19,8 +53,6 @@ var csrfToken = $("meta[name='_csrf']").attr("content");
 var headers = {
       login: 'guest',
       passcode: 'guest',
-      currDocId: $("#docId").val(),
-      sessionId: $("#sessionId").val(),
 };
 headers[csrfHeader] = csrfToken;
 
@@ -30,11 +62,10 @@ var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
 //	conData.client.debug = null;
+	getGeoLocation();
 	conData.hashCode = sub('user', 'getChallenge', handleChallenge);
-	conData.client.send("/app/tokenCreate", {}, docId);
+	conData.client.send("/app/tokenCreate", {userObj: conData.getUserObjects()});
 	if(pageName == "start"){
-		window.localStorage.setItem("pCred", $("#cred").val());
-		$("#cred").val('');
 		conData.delDocSub = sub('topic', 'delDoc', handleDelDocBroadcast); 
 		conData.addDocSub = sub('topic', 'addDoc', handleAddDocBroadcast);
 	}else if(pageName == "readdoc"){
@@ -53,19 +84,9 @@ conData.client.connect(headers, function(frame){
 
 //Set the challenge given by the server to a CRAM MD5
 function setHash(challenge){
-//	var bcrypt = new bCrypt();
-//	bcrypt.hashpw($("#cred").val(), bcrypt.gensalt(4), result, function(){});
-//	function result(newhash){
-//		window.localStorage.setItem("pCred", newhash);
-//	}	
-//	
-//	var cred = window.localStorage.getItem("pCred");
-	console.log("CHALL: "+challenge);
-	console.log("PASS: "+window.localStorage.getItem("pCred"));
-	var md5 = $.md5(challenge + window.localStorage.getItem("pCred"));
-	console.log("MD5: "+md5);
+	var chlng = $.base64.atob(challenge);
+	var md5 = $.md5(chlng + conData.getUserObjects());
 	var base64 = $.base64.btoa(md5);
-	console.log("B64: "+base64);
 	window.localStorage.setItem("pChallenge", base64);
 };
 
@@ -77,8 +98,8 @@ function getHash(){
 //Server-Client -- Challenge comes from server
 function handleChallenge(incoming){
 	var payload = JSON.parse(incoming.body);
-	var hashCode = payload.challenge;
-	setHash(hashCode);
+	var challenge = payload.challenge;
+	setHash(challenge);
 };
 
 //Client-Server -- When a request for Document editing is placed (by clicking the edit button)
@@ -128,7 +149,7 @@ function handleDocBroadcast(incoming) {
 	var payload = JSON.parse(incoming.body);
 	var object = payload.object;
 	var task = payload.task;
-	console.log(task);
+	
 	if(task == "writeMode"){
 		lockView();
 	}else if(task == "lockDoc"){
@@ -307,6 +328,8 @@ function sub(type, url, callback){
 		return null;
 	}
 };
+
+
 
 //Server-Client -- Check at the beginning of the document if it is locked in database
 function handleCheckDoc(incoming){

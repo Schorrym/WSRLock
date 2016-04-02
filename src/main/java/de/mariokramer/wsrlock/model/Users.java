@@ -25,6 +25,9 @@ public class Users {
 	@Column(name="userHash")
 	private String userHash;
 	
+	@Column(name="jSession", columnDefinition = "text")
+	private String jSession;
+	
 	@Column(name="enabled")
 	private int enabled;
 	
@@ -33,6 +36,12 @@ public class Users {
 	}
 	public void setUserPass(String userPass) {
 		this.userPass = userPass;
+	}
+	public String getjSession() {
+		return jSession;
+	}
+	public void setjSession(String jSession) {
+		this.jSession = jSession;
 	}
 	public int getEnabled() {
 		return enabled;

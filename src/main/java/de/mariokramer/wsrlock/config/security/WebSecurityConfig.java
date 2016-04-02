@@ -1,7 +1,5 @@
 package de.mariokramer.wsrlock.config.security;
 
-import java.security.MessageDigest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,9 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import de.mariokramer.wsrlock.model.Users;
 import de.mariokramer.wsrlock.persistence.CustomUserDetailsService;
-import de.mariokramer.wsrlock.persistence.UserDao;
 
 @EnableWebSecurity
 @Configuration
@@ -26,30 +22,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	UserDetailsService userDetailsService;
-	@Autowired
-	UserDao ud;
-	
-//	@Override
-//	@Autowired
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//		auth.inMemoryAuthentication().withUser("mario").password("test").roles("USER");
-//		auth.inMemoryAuthentication().withUser("q").password("q").roles("USER");
-//	}
 	
 	@Autowired
 	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-		auth.eraseCredentials(false);
-		auth.userDetailsService(userDetailsService);//.passwordEncoder(passwordEncoder());
+		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
 	
 	@Bean(name = "passwordEncoder")
 	public PasswordEncoder passwordEncoder() {
-//		BCryptPasswordEncoder bc = new BCryptPasswordEncoder(4);		
-//		
-//		Users user = ud.getUsersByUserName("q");
-//		user.setUserPass("q");	
-//		ud.save(user);
-
 		return new BCryptPasswordEncoder(4);
 	}
 
@@ -63,6 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.formLogin().loginPage("/login").permitAll().failureUrl("/login?error").defaultSuccessUrl("/start");
 		http.authorizeRequests()
 			.antMatchers("/resources/**").permitAll()
+			.antMatchers("/start").authenticated()
 			.anyRequest().authenticated();
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll().invalidateHttpSession(true);
 		http.headers().frameOptions().sameOrigin();

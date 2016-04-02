@@ -30,10 +30,6 @@ public Long getUserRoleId() {
 	return userRoleId;
 }
 
-public void setUserRoleId(Long userRoleId) {
-	this.userRoleId = userRoleId;
-}
-
 public Long getUserId() {
 	return userId;
 }
