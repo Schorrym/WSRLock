@@ -1,7 +1,5 @@
 package de.mariokramer.wsrlock.controller;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.Principal;
 
 import java.util.Date;
@@ -24,6 +22,7 @@ import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
+import de.mariokramer.wsrlock.config.security.MD5;
 import de.mariokramer.wsrlock.model.DocUsers;
 import de.mariokramer.wsrlock.model.Document;
 import de.mariokramer.wsrlock.model.DocumentResourceLock;
@@ -71,17 +70,12 @@ public class WebSocketController{
 		String md5 = StringUtils.newStringUtf8(Base64.decodeBase64(base64));
 		String challenge = null;
 		String hash = null;
-		MessageDigest md;
 		try{
-			challenge = user.getUserHash() + user.getjSession();
-			md = MessageDigest.getInstance("MD5");
-			md.update(challenge.getBytes(), 0, challenge.length());
-			hash = new BigInteger(1,md.digest()).toString(16);
-			
+			challenge = user.getUserHash().concat(user.getjSession());
+			hash = MD5.getMD5(challenge);			
 		}catch (Exception e){
 			log.error("No User found "+e.getStackTrace());
 		}
-		
 		if(md5.equals(hash) && userName != null){
 			generateChallenge(user);
 			return true;
@@ -96,7 +90,6 @@ public class WebSocketController{
 		String challenge = randomNum + date;
 		String hash = null;
 		try {
-//			user = userDao.findOne(user.getUserId());
 			user.setUserHash(challenge);
 			userDao.save(user);
 		} catch (Exception e) {

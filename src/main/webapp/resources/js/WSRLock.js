@@ -10,41 +10,33 @@ var sock = new SockJS(url);
 var conData = {};
 
 //Gets the geoLocation from the Browsers Navigator Object
-function getGeoLocation(){
-	var options = {
-			  enableHighAccuracy: true,
-			  timeout: 5000,
-			  maximumAge: 0
-			};
-
-			function success(pos) {
-			  var crd = pos.coords;
-			  conData.posLatitude = crd.latitude;
-			  conData.posLongitude = crd.longitude;
-			};
-
-			function error(err) {
-			  console.warn('ERROR(' + err.code + '): ' + err.message);
-			};
-
-			navigator.geolocation.getCurrentPosition(success, error, options);
-};
+//function getGeoLocation(){
+//	if (navigator.geolocation) { 
+//		function success(pos) {
+//		  var crd = pos.coords;
+//		  conData.position = crd.latitude + crd.longitude;
+//		};
+//
+//		function error(err) {
+//		  console.warn('ERROR(' + err.code + '): ' + err.message);
+//		};
+//
+//		navigator.geolocation.getCurrentPosition(success, error);
+//	}
+//};
 
 //Collects all information within the Navigator Object to identify the Client-side
-conData.getUserObjects = function(){	
+conData.getUserObjects = function(){
 	var useObj = JSON.stringify({'userAgent': navigator.userAgent,
 									'appVersion': navigator.appVersion,
 									'platform': navigator.platform,
 									'appName': navigator.appName,
-//									'posLatitude': conData.posLatitude,
-//									'posLongitude': conData.posLongitude,
 									'jSession': window.localStorage.getItem("jSession")});
 	return useObj;
 };
 
 //Defining that STOMP will be used with the SockJS Protocol as fallback options
 conData.client = Stomp.over(sock);
-
 //Get the CSRF attributes from the initial JSP page
 var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 var csrfToken = $("meta[name='_csrf']").attr("content");
@@ -61,8 +53,7 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
-//	conData.client.debug = null;
-	getGeoLocation();
+	conData.client.debug = null;
 	conData.hashCode = sub('user', 'getChallenge', handleChallenge);
 	conData.client.send("/app/tokenCreate", {userObj: conData.getUserObjects()});
 	if(pageName == "start"){
@@ -85,7 +76,8 @@ conData.client.connect(headers, function(frame){
 //Set the challenge given by the server to a CRAM MD5
 function setHash(challenge){
 	var chlng = $.base64.atob(challenge);
-	var md5 = $.md5(chlng + conData.getUserObjects());
+	var chlngClient = chlng.concat(conData.getUserObjects());
+	var md5 = $.md5(chlngClient);
 	var base64 = $.base64.btoa(md5);
 	window.localStorage.setItem("pChallenge", base64);
 };
@@ -114,7 +106,6 @@ function editDoc(){
 function lockView(){
 	$("#editButton").attr("onclick", "");
 	$("#status").text("writing");
-	console.log('Document is now locked');
 };
 
 //Dialog pops up before content gets refreshed after saving new document
@@ -229,7 +220,6 @@ function handleLockIncome(incoming){
 		var currDocId = $("#docId").val();
 		conData.docSub = sub('topic', 'doc'+currDocId, handleDocBroadcast);
 		clearInterval(conData.interval);
-		console.log('document was saved');
 	}else if(task == "userUpdate"){
 		userUpdate(object);
 	}
@@ -259,7 +249,6 @@ function delDoc(docId){
 function handleDelDocBroadcast(incoming) {
 	var docId = JSON.parse(incoming.body);
 	$("#delDocId"+docId).closest('tr').remove();
-	console.log('Deleted document with ID: '+docId+' from database');
 };
 
 //Client->Server -- When adding a document on the start page
