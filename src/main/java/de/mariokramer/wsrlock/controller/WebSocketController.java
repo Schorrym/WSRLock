@@ -55,8 +55,6 @@ public class WebSocketController{
 	private UserDao userDao;
 	@Autowired
 	private DocUsersDao docUserDao;
-	
-	private boolean check = false;
 
 	private boolean checkChallenge(String base64, String userName){
 		Users user = null;
@@ -137,7 +135,7 @@ public class WebSocketController{
 	public Message<DocumentResourceLock> checkDoc(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			Users user = null;
 			user = userDao.getUsersByUserName(p.getName());
 			
@@ -178,7 +176,7 @@ public class WebSocketController{
 	public void broadcastUser(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			doc = docDao.findOne(doc.getDocId());		
 			List<DocUsers> dus = docUserDao.findAllByDoc(doc);		
 			LinkedList<String> users = new LinkedList<String>();
@@ -203,7 +201,7 @@ public class WebSocketController{
 	public void autoSave(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			String tempValue = doc.getDocValue();
 			doc = docDao.findOne(doc.getDocId());
 			
@@ -237,7 +235,7 @@ public class WebSocketController{
 	public void leaveDoc(Message msg, Principal p, 
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			Document doc = docDao.findOne(Long.valueOf(msg.getTask()));
 			Users user = userDao.getUsersByUserName(p.getName());
 			DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
@@ -254,7 +252,7 @@ public class WebSocketController{
 	public Message<Document> saveDoc(Document doc, Principal p,
 			@Header(value="challenge") String challenge){
 		
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			Long docVersion = doc.getDocVersion();
 			Document newDoc = docDao.findOne(doc.getDocId());
 			Users user = userDao.getUsersByUserName(p.getName());
@@ -283,7 +281,7 @@ public class WebSocketController{
 	@SendToUser("/queue/editMode")
 	public Message<DocumentResourceLock> editDoc(Document doc, Principal p,
 			@Header(value="challenge") String challenge){
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			doc = docDao.findOne(doc.getDocId());		
 			Users user = userDao.getUsersByUserName(p.getName());		
 			DocUsers du = docUserDao.findOneByUserAndDoc(user, doc);
@@ -324,7 +322,7 @@ public class WebSocketController{
 	@MessageMapping("/delDoc")
 	public void deleteDocument(Document doc, Principal p, 
 			@Header(value="challenge") String challenge){
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			if(docDao.findOne(doc.getDocId()) != null) {
 				docDao.delete(doc.getDocId());
 				docWebSocketService.deleteDocument(doc.getDocId());
@@ -341,7 +339,7 @@ public class WebSocketController{
 	public void addDocument(Document doc, Principal p, 
 			@Header(value="challenge") String challenge) {		
 
-		if(checkChallenge(challenge, p.getName()) || check){
+		if(checkChallenge(challenge, p.getName())){
 			doc = docDao.save(doc);
 			if(doc.getDocValue().length() > 64){
 				doc.setDocValue(doc.getDocValue().substring(0,32) + "...");
