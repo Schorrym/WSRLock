@@ -10,20 +10,20 @@ var sock = new SockJS(url);
 var conData = {};
 
 //Gets the geoLocation from the Browsers Navigator Object
-//function getGeoLocation(){
-//	if (navigator.geolocation) { 
-//		function success(pos) {
-//		  var crd = pos.coords;
-//		  conData.position = crd.latitude + crd.longitude;
-//		};
-//
-//		function error(err) {
-//		  console.warn('ERROR(' + err.code + '): ' + err.message);
-//		};
-//
-//		navigator.geolocation.getCurrentPosition(success, error);
-//	}
-//};
+function getGeoLocation(){
+	if (navigator.geolocation) { 
+		function success(pos) {
+		  var crd = pos.coords;
+		  conData.position = crd.latitude + crd.longitude;
+		};
+
+		function error(err) {
+		  console.warn('ERROR(' + err.code + '): ' + err.message);
+		};
+
+		navigator.geolocation.getCurrentPosition(success, error);
+	}
+};
 
 //Collects all information within the Navigator Object to identify the Client-side
 conData.getUserObjects = function(){
@@ -53,6 +53,7 @@ var currDocId = $("#docId").val();
 var interval;
 //Connect with the above given credentials
 conData.client.connect(headers, function(frame){
+	//No STOMP debugging is shown in the browser console
 	conData.client.debug = null;
 	conData.hashCode = sub('user', 'getChallenge', handleChallenge);
 	conData.client.send("/app/tokenCreate", {userObj: conData.getUserObjects()});

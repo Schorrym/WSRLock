@@ -6,5 +6,3 @@
 <!-- Crypt Plugins -->
 <script src="resources/js/jquery.base64.js"></script>
 <script src="resources/js/jquery.md5.js"></script>
-<script src="resources/js/bCrypt.js"></script>
-<script src="resources/js/isaac.js"></script>
