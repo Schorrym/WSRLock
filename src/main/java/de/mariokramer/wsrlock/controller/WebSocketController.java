@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.codec.binary.StringUtils;
@@ -127,7 +128,7 @@ public class WebSocketController{
 		if(user != null){
 			user.setjSession(userObj);
 			generateChallenge(user);
-		}			
+		}
 	}
 	
 	@MessageMapping("/checkDoc")
